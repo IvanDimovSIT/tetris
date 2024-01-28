@@ -44,6 +44,9 @@ impl Board {
         }
 
         let mut board = Board{width: width, height: height, squares: vec![], active_piece: starting_piece, listener: board_listener};
+        for _ in (0..(width*height)) {
+            board.squares.push(Square::None);
+        }
 
         Ok(board)
     }
