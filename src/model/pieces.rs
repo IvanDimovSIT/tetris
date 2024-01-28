@@ -93,7 +93,7 @@ impl Piece for LPiece {
     }
 
     fn get_color(&self) -> Color {
-        Color::Yellow
+        Color::Blue
     }
 
     fn get_squares(&self) -> Vec<(i32, i32)> {

@@ -1,5 +1,8 @@
+use self::pieces::SquarePiece;
+
 mod pieces;
 
+#[derive(Clone)]
 pub enum Color {
     Red,
     Green,
@@ -7,6 +10,7 @@ pub enum Color {
     Blue,
 }
 
+#[derive(Clone)]
 pub enum Square {
     None,
     Normal(Color),
@@ -23,7 +27,7 @@ pub trait Piece {
 }
 
 
-pub trait BoardListener {
+pub trait GameListenerListener {
     fn on_line_cleared(&self, lines_y: Vec<usize>);
     fn on_game_over(&self);
     fn on_piece_set(&self);
@@ -35,15 +39,14 @@ struct Board {
     width: usize,
     height: usize,
     active_piece: Box<dyn Piece>,
-    listener: Box<dyn BoardListener>,
 }
 impl Board {
-    fn new(width: usize, height: usize, starting_piece: Box<dyn Piece>, board_listener: Box<dyn BoardListener>) -> Result<Board, String> {
+    fn new(width: usize, height: usize, starting_piece: Box<dyn Piece>) -> Result<Board, String> {
         if width < 4 || height < 6 {
             return Err("Invalid width or height".to_string());
         }
 
-        let mut board = Board{width: width, height: height, squares: vec![], active_piece: starting_piece, listener: board_listener};
+        let mut board = Board{width: width, height: height, squares: vec![], active_piece: starting_piece};
         for _ in (0..(width*height)) {
             board.squares.push(Square::None);
         }
@@ -62,6 +65,11 @@ impl Board {
     fn get_height(&self) -> usize {
         self.height
     }
+
+    fn set_square(&mut self, position: (usize, usize), square: Square) {
+        debug_assert!(position.0 < self.width && position.1 < self.height);
+        self.squares[position.0 + position.1*self.width] = square
+    }
     
     fn get_square(&self, position: (usize, usize)) -> Option<&Square> {
         if position.0 >= self.width || position.1 >= self.height {
@@ -72,7 +80,7 @@ impl Board {
     }
 
     fn move_active_left(&mut self) -> bool {
-        assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
+        debug_assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
         let pos = self.active_piece.get_position();
         self.active_piece.set_position((pos.0-1, pos.1));
         
@@ -85,7 +93,7 @@ impl Board {
     }  
 
     fn move_active_right(&mut self) -> bool {
-        assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
+        debug_assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
         let pos = self.active_piece.get_position();
         self.active_piece.set_position((pos.0+1, pos.1));
         
@@ -98,7 +106,7 @@ impl Board {
     }  
 
     fn move_active_down(&mut self) -> bool {
-        assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
+        debug_assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
         let pos = self.active_piece.get_position();
         self.active_piece.set_position((pos.0, pos.1+1));
         
@@ -111,7 +119,7 @@ impl Board {
     }
 
     fn rotate_active_left(&mut self) -> bool {
-        assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
+        debug_assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
         if !self.active_piece.rotate_left() {
             return false;
         }
@@ -125,7 +133,7 @@ impl Board {
     }
 
     fn rotate_active_right(&mut self) -> bool {
-        assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
+        debug_assert!(self.is_active_piece_position_valid(&self.active_piece.get_squares()));
         if !self.active_piece.rotate_right() {
             return false;
         }
@@ -192,5 +200,68 @@ impl Board {
                 _ => {panic!("Error positioning ghost pieces")},
             }
         }
+    }
+
+    fn set_active_piece(&mut self, new_active: Box<dyn Piece>) {
+        let squares_to_set = self.active_piece.get_squares();
+        debug_assert!(self.is_active_piece_position_valid(&squares_to_set));
+        for i in squares_to_set {
+            self.set_square((i.0 as usize, i.1 as usize), Square::Normal(self.active_piece.get_color()));
+        }
+
+        self.active_piece = new_active;
+    }
+
+    fn find_lines_to_clear(&self) -> Vec<usize> {
+        let mut lines_to_clear:  Vec<usize> = vec![];
+        for y in 0..self.height {
+            let mut is_line_full = true;
+            for x in 0..self.width {
+                match self.get_square((x,y)).unwrap() {
+                    Square::Normal(_) => {},
+                    _ => {
+                        is_line_full = false; 
+                        break;
+                    },
+                }
+            }
+            
+            if is_line_full {
+                lines_to_clear.push(y);
+            }
+        }
+
+        lines_to_clear
+    }
+
+    fn clear_line(&mut self, row: usize) {
+        for x in 0..self.width {
+            self.set_square((x, row), Square::None);
+        }
+
+        for y in (1..row).rev() {
+            for x in 0..self.width {
+                let square_to_add = self.get_square((x, y-1));
+                debug_assert!(square_to_add.is_some());
+                self.set_square((x, y), square_to_add.unwrap().clone());
+            }
+        }
+
+        for x in 0..self.width {
+            self.set_square((x, 0), Square::None);
+        }
+    }
+
+    fn clear_lines(&mut self) -> Vec<usize> {
+        let lines_to_clear = self.find_lines_to_clear();
+        if lines_to_clear.is_empty() {
+            return  lines_to_clear;
+        }
+
+        for i in &lines_to_clear {
+            self.clear_line(*i);
+        }
+
+        lines_to_clear
     }
 }
