@@ -1,6 +1,6 @@
 use crate::model::Piece;
 
-use super::Color;
+use super::{Color, PieceType};
 
 pub struct SquarePiece {
     position: (i32, i32),
@@ -35,6 +35,11 @@ impl Piece for SquarePiece {
     fn rotate_right(&mut self) -> bool {
         false
     }
+
+    fn get_type(&self) -> PieceType {
+        PieceType::Square
+    }
+
 }
 impl SquarePiece {
     pub fn new(position: (i32, i32)) -> SquarePiece {
@@ -127,6 +132,11 @@ impl Piece for LPiece {
 
         true
     }
+
+    fn get_type(&self) -> PieceType {
+        PieceType::L
+    }
+
 }
 impl LPiece {
     pub fn new(position: (i32, i32)) -> LPiece {
