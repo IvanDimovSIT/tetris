@@ -1,8 +1,3 @@
-use comfy::{Color, EngineState, GameLoop};
-
-use crate::model::Square;
-
-
 pub const WIDTH: usize = 10;
 pub const HEIGHT: usize = 20;
 pub const LOOK_AHEAD: i32 = 3;
@@ -48,3 +43,6 @@ pub const SQUARE_GHOST_COLOR_COEF: f32 = 0.4;
 
 pub const BOARD_Z: i32 = 0;
 pub const SQUARES_Z: i32 = 1;
+
+pub const START_DIFFICULTY: f32 = 1.0;
+pub const DIFFICULTY_INCREASE: f32 = 0.1;

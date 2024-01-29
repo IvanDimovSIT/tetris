@@ -2,105 +2,24 @@ mod model;
 mod constants;
 
 use comfy::epaint::FontId;
-use comfy::kira::spatial::listener;
-use comfy::{Color, Rc};
+
+
 use comfy::*;
 use comfy::EngineState;
-use model::{GameListener, Square};
+use model::Square;
 
-use std::cell::RefCell;
-use std::borrow::BorrowMut;
-use std::thread::panicking;
-use crate::model::{Game};
+use crate::model::Game;
 use crate::constants::*;
+use crate::model::GameEvent;
 
-use comfy::RED;
-use comfy::simple_game;
 use comfy::vec2;
-use comfy::draw_circle;
+
 use comfy::GameLoop;
-
-/* 
-struct Listener{
-}
-impl GameListener for Listener {
-    fn on_line_cleared(&self, lines_y: Vec<usize>) {
-        println!("on_line_cleared");
-    }
-    fn on_game_over(&self){
-        println!("on_game_over");
-    }
-    
-    fn on_piece_set(&self){
-        println!("on_piece_set");
-    }
-    
-    fn on_score_changed(&self, score: i32){
-        println!("on_score_changed");
-    }
-}
-
-fn print_game(squares: Vec<Square>) {
-    for y in 0..HEIGHT {
-        for x in 0..WIDTH {
-            let c;
-            match squares[x + y*WIDTH] {
-                Square::Normal(C) => {
-                    match C {
-                        Color::Blue => {c = 'B'},
-                        Color::Yellow => {c = 'Y'},
-                        Color::Green => {c = 'G'},
-                        Color::Red => {c = 'R'},
-                        _ => {c = '_'},
-                    }
-                },
-                Square::Ghost(C) => {
-                    match C {
-                        Color::Blue => {c = 'b'},
-                        Color::Yellow => {c = 'y'},
-                        Color::Green => {c = 'g'},
-                        Color::Red => {c = 'r'},
-                        _ => {c = '_'},
-                    }
-                }
-                Square::None => {
-                    c = '.';
-                },
-                _ => {c = 'X'},
-            }
-            print!("{c} ");
-        }
-        println!();
-    }
-    println!();
-}
-*/
-/* 
-fn main() {
-    println!("Hello, world!");
-
-    let mut game = Game::new(WIDTH, HEIGHT, 3, Box::new(Listener{})).unwrap();
-    print_game(game.get_board_squares());
-
-    game.next_step();
-    print_game(game.get_board_squares());
-
-    game.move_left();
-    print_game(game.get_board_squares());
-
-    for _ in 0..15 {
-        game.next_step();
-        print_game(game.get_board_squares());
-    }
-
-}
-*/
-
 
 struct GameLoopImpl{
     game_state: Game,
-    game_listner: GameListenerImpl,
     time_passed: f32,
+    difficulty: f32,
 }
 impl GameLoopImpl {
     fn draw_game_board_bg(&self) {
@@ -152,9 +71,6 @@ impl GameLoopImpl {
         color.b *= SQUARE_INNER_COLOR_COEF;
 
         draw_rect(center,  splat(SQUARE_SIZE_INNER), color, SQUARES_Z + 1);
-
-        //draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 }, SQUARES_Z)
-
     }
 
     fn draw_score(&self) {
@@ -181,31 +97,49 @@ impl GameLoopImpl {
             self.draw_square(((ind%WIDTH) as u32, (ind/WIDTH) as u32), s);
         }
         self.draw_score();
-        //self.draw_square((2,1), &Square::Normal(model::Color::Yellow));
-        //self.draw_square((4,0), &Square::Normal(model::Color::Red));
-        //self.draw_square((7,12), &Square::Normal(model::Color::Green));
+
     }
 
-    fn next_game_state(&mut self) {
-        self.game_state.next_step(&mut self.game_listner);
+    fn on_lines_cleared(&mut self, lines: Vec<usize>) {
+        if lines.is_empty() {
+            return;
+        }
+
+        println!("cleared lines:{}", lines.len());
+        self.difficulty += DIFFICULTY_INCREASE;
     }
+
+    fn handle_game_events(&mut self, events: Vec<GameEvent>){
+        for i in events {
+            match i {
+                GameEvent::GameOver(score) => {
+                    println!("Game over! score:{score}");
+                    todo!("display score and exit game");
+                },
+                GameEvent::PieceSet => {
+                    println!("Piece set")
+                },
+                GameEvent::LinesCleared(lines) => {self.on_lines_cleared(lines)},
+                _ => {},
+            }
+        }
+    }
+
 }
 impl GameLoop for GameLoopImpl{
     fn new(c: &mut EngineState) -> Self {
         let mut game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let mut game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, game_listner: GameListenerImpl{}};     
+        let mut game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY};     
         
         game_loop
     }
 
-
-
     fn update(&mut self, _c: &mut EngineContext) {
         self.time_passed += _c.delta;
         dbg!(self.time_passed);
-
+        let mut game_events: Vec<GameEvent> = vec![];
         
         if is_key_pressed(KeyCode::Space) {
             panic!("Unumplemented");
@@ -229,35 +163,24 @@ impl GameLoop for GameLoopImpl{
         }
 
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            self.next_game_state();
+            let received = self.game_state.next_step();
+            for i in received {
+                game_events.push(i);
+            }
         }
 
-        if self.time_passed >= 1.0 {
+        if self.time_passed >= 1.0/self.difficulty {
             self.time_passed = 0.0;
-            self.next_game_state();
+            let received = self.game_state.next_step();
+            for i in received {
+                game_events.push(i);
+            }
         }
         self.redraw();
-
+        self.handle_game_events(game_events);
     }
 }
 
-struct GameListenerImpl{}
-impl GameListener for GameListenerImpl {
-    fn on_line_cleared(&self, lines_y: Vec<usize>) {
-        println!("on_line_cleared: {}", lines_y.len());
-    }
-    fn on_game_over(&self){
-        println!("on_game_over");
-    }
-    
-    fn on_piece_set(&self){
-        println!("on_piece_set");
-    }
-    
-    fn on_score_changed(&self, score: i32){
-        println!("on_score_changed: {score}");
-    }
-}
 
 pub fn _comfy_default_config(config: GameConfig) -> GameConfig {
     let mut new_config = config.clone();

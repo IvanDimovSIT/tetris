@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use comfy::notify::{event, Event};
 use rand::Rng;
 
 use self::pieces::{LPiece, SquarePiece};
@@ -265,19 +266,24 @@ impl Board {
     }
 }
 
-
+/* 
 pub trait GameListener {
     fn on_line_cleared(&self, lines_y: Vec<usize>);
     fn on_game_over(&self);
     fn on_piece_set(&self);
     fn on_score_changed(&self, score: i32);
 }
-
+*/
+pub enum GameEvent {
+    LinesCleared(Vec<usize>),
+    GameOver(i32),
+    PieceSet,
+}
 
 pub struct Game {
     board: Board,
     score: i32,
-    look_ahead: i32,
+    //look_ahead: i32,
     next: VecDeque<Box<dyn Piece>>,
 }
 impl Game {
@@ -288,7 +294,7 @@ impl Game {
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, look_ahead: look_ahead, next: pieces})
+            Ok(Game {board: board.unwrap(), score: 0, /*look_ahead: look_ahead,*/ next: pieces})
         }
     }
 
@@ -305,30 +311,31 @@ impl Game {
         piece
     }
 
-    pub fn next_step(&mut self, listener:  &mut dyn GameListener) -> bool {
+    pub fn next_step(&mut self) -> Vec<GameEvent> {
+        let mut events: Vec<GameEvent> = vec![];
+
         if !self.board.move_active_down() {
             self.board.set_active_piece(self.next.pop_back().unwrap());
-            listener.on_piece_set();
+            events.push(GameEvent::PieceSet);
             self.next.push_front(Game::generate_piece(self.board.width));
             let cleared_lines = self.board.clear_lines();
             self.score += cleared_lines.len() as i32 * 100;                         //update score
-            listener.on_line_cleared(cleared_lines);
-            listener.on_score_changed(self.score);
-
+            if !cleared_lines.is_empty() {
+                events.push(GameEvent::LinesCleared(cleared_lines.clone()));
+            }
             if !self.board.is_active_piece_valid() {
-                listener.on_game_over();
-
-                return false;
+                events.push(GameEvent::GameOver(self.score));
+                return events;
             }
         }
 
         self.board.position_ghost_pieces();        
-        return true;
+        return events;
     }
 
-    pub fn move_down(&mut self, listener: &mut dyn GameListener) {
+    pub fn move_down(&mut self) {
         if !self.board.move_active_down() {
-            self.next_step(listener);
+            //self.next_step(listener);
         }
         self.board.position_ghost_pieces();
     }
