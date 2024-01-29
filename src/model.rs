@@ -106,6 +106,19 @@ impl Board {
         }
     }
 
+    fn move_active_up(&mut self) -> bool {
+        debug_assert!(self.is_active_piece_valid());
+        let pos = self.active_piece.get_position();
+        self.active_piece.set_position((pos.0, pos.1-1));
+        
+        if self.is_active_piece_valid() {
+            true
+        }else{
+            self.active_piece.set_position(pos);
+            false
+        }
+    }
+
     fn rotate_active_left(&mut self) -> bool {
         debug_assert!(self.is_active_piece_valid());
         if !self.active_piece.rotate_left() {
@@ -319,6 +332,15 @@ impl Game {
 
         self.board.position_ghost_pieces();        
         return events;
+    }
+
+    pub fn can_move_down(&mut self) -> bool {
+        if self.board.move_active_down() {
+            assert!(self.board.move_active_up());
+            true
+        }else{
+            false
+        }
     }
 
     pub fn set_piece_down(&mut self) {

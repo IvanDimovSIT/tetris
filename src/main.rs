@@ -1,8 +1,8 @@
 mod model;
 mod constants;
 
-use comfy::epaint::FontId;
 
+use comfy::epaint::FontId;
 
 use comfy::*;
 use comfy::EngineState;
@@ -265,7 +265,17 @@ impl GameLoop for GameLoopImpl{
             }
         }
 
-        if self.time_passed >= 1.0/self.difficulty {
+        let mut step_delay = if self.game_state.can_move_down() {
+            1.0/self.difficulty
+        }else{
+            (1.0/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
+        };
+
+        if step_delay > PLACE_PIECE_DELAY_MAX {
+            step_delay = PLACE_PIECE_DELAY_MAX;
+        }
+
+        if self.time_passed >= step_delay {
             self.time_passed = 0.0;
             let received = self.game_state.next_step();
             for i in received {
