@@ -1,6 +1,6 @@
 use crate::model::Piece;
 
-use super::{Color, PieceType};
+use super::{Color/*, PieceType*/};
 
 pub struct SquarePiece {
     position: (i32, i32),
@@ -36,9 +36,9 @@ impl Piece for SquarePiece {
         false
     }
 
-    fn get_type(&self) -> PieceType {
-        PieceType::Square
-    }
+    //fn get_type(&self) -> PieceType {
+    //    PieceType::Square
+    //}
 
 }
 impl SquarePiece {
@@ -133,9 +133,9 @@ impl Piece for LPiece {
         true
     }
 
-    fn get_type(&self) -> PieceType {
-        PieceType::L
-    }
+    //fn get_type(&self) -> PieceType {
+    //    PieceType::L
+    //}
 
 }
 impl LPiece {

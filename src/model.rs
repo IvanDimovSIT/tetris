@@ -1,6 +1,5 @@
 use std::collections::VecDeque;
 
-use comfy::Itertools;
 use rand::Rng;
 
 use crate::constants::*;
@@ -24,10 +23,10 @@ pub enum Square {
     Ghost(Color),
 }
 
-pub enum PieceType{
-    Square,
-    L,
-}
+//pub enum PieceType{
+//    Square,
+//    L,
+//}
 
 pub trait Piece {
     fn get_position(&self) -> (i32, i32);
@@ -36,7 +35,7 @@ pub trait Piece {
     fn get_squares(&self) -> Vec<(i32, i32)>;
     fn rotate_left(&mut self) -> bool;
     fn rotate_right(&mut self) -> bool;
-    fn get_type(&self) -> PieceType;
+    //fn get_type(&self) -> PieceType;
 }
 
 struct Board {
@@ -342,40 +341,47 @@ impl Game {
         return events;
     }
 
-    pub fn move_down(&mut self) {
-        if !self.board.move_active_down() {
-            //self.next_step(listener);
+    pub fn set_piece_down(&mut self) {
+        while self.board.move_active_down() {
         }
         self.board.position_ghost_pieces();
     }
 
-    pub fn move_left(&mut self) {
-        self.board.move_active_left();
+    pub fn move_left(&mut self) -> bool {
+        let result = self.board.move_active_left();
         self.board.position_ghost_pieces();
+
+        result
     }
 
-    pub fn move_right(&mut self) {
-        self.board.move_active_right();
+    pub fn move_right(&mut self) -> bool {
+        let result = self.board.move_active_right();
         self.board.position_ghost_pieces();
+
+        result
     }
 
-    pub fn rotate_left(&mut self) {
-        self.board.rotate_active_left();
+    pub fn rotate_left(&mut self) -> bool {
+        let result = self.board.rotate_active_left();
         self.board.position_ghost_pieces();
+
+        result
     }
 
-    pub fn rotate_right(&mut self) {
-        self.board.rotate_active_right();
+    pub fn rotate_right(&mut self) -> bool {
+        let result = self.board.rotate_active_right();
         self.board.position_ghost_pieces();
+
+        result
     }
 
     pub fn get_score(&self) -> i32 {
         self.score
     }
 
-    pub fn get_next_pieces(&self) -> Vec<PieceType> {
-        self.next.iter().map(|x| {x.get_type()}).collect()
-    }
+    //pub fn get_next_pieces(&self) -> Vec<PieceType> {
+    //    self.next.iter().map(|x| {x.get_type()}).collect()
+    //}
 
     pub fn get_board_squares(&self) -> Vec<Square> {
         let mut squares = self.board.squares.clone();

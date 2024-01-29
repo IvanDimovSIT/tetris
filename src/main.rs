@@ -132,6 +132,55 @@ impl GameLoopImpl {
         self.difficulty += DIFFICULTY_INCREASE;
     }
 
+    fn handle_rotate_left(&mut self){
+        let result = self.game_state.rotate_left();
+        if result {
+            return;
+        }
+        if self.game_state.move_left() {
+            if self.game_state.rotate_left() {
+                return;
+            }else{
+                assert!(self.game_state.move_right());
+            }
+        }
+        if self.game_state.move_right() {
+            if self.game_state.rotate_left() {
+                return;
+            }else{
+                assert!(self.game_state.move_left());
+            }
+        }
+    }
+
+    fn handle_rotate_right(&mut self){
+        let result = self.game_state.rotate_right();
+        if result {
+            return;
+        }
+        if self.game_state.move_left() {
+            if self.game_state.rotate_right() {
+                return;
+            }else{
+                assert!(self.game_state.move_right());
+            }
+        }
+        if self.game_state.move_right() {
+            if self.game_state.rotate_right() {
+                return;
+            }else{
+                assert!(self.game_state.move_left());
+            }
+        }
+    }
+
+    fn handle_set_piece(&mut self){
+        self.game_state.set_piece_down();
+        let events = self.game_state.next_step();
+        self.time_passed = 0.0;
+        self.handle_game_events(events);
+    }
+
     fn handle_game_events(&mut self, events: Vec<GameEvent>){
         for i in events {
             match i {
@@ -150,11 +199,11 @@ impl GameLoopImpl {
 
 }
 impl GameLoop for GameLoopImpl{
-    fn new(c: &mut EngineState) -> Self {
-        let mut game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
+    fn new(_c: &mut EngineState) -> Self {
+        let game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let mut game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY};     
+        let game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY};     
         
         game_loop
     }
@@ -165,7 +214,7 @@ impl GameLoop for GameLoopImpl{
         let mut game_events: Vec<GameEvent> = vec![];
         
         if is_key_pressed(KeyCode::Space) {
-            panic!("Unumplemented");
+            self.handle_set_piece();
         }
 
         if is_key_pressed(KeyCode::Left) || is_key_pressed(KeyCode::A) {
@@ -177,12 +226,12 @@ impl GameLoop for GameLoopImpl{
         }
 
         if is_key_pressed(KeyCode::Q) || is_key_pressed(KeyCode::Z) {
-            self.game_state.rotate_left();
+            self.handle_rotate_left();
         }
 
         if is_key_pressed(KeyCode::E) || is_key_pressed(KeyCode::X) ||
             is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
-            self.game_state.rotate_right();
+            self.handle_rotate_right();
         }
 
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
