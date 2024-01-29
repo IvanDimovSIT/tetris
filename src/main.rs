@@ -1,11 +1,14 @@
 mod model;
 mod constants;
 
-use comfy::Color;
+use comfy::kira::spatial::listener;
+use comfy::{Color, Rc};
 use comfy::*;
 use comfy::EngineState;
 use model::{GameListener, Square};
 
+use std::cell::RefCell;
+use std::borrow::BorrowMut;
 use crate::model::{Game};
 use crate::constants::*;
 
@@ -94,6 +97,8 @@ fn main() {
 
 struct GameLoopImpl{
     game_state: Game,
+    game_listner: GameListenerImpl,
+    time_passed: f32,
 }
 impl GameLoopImpl {
     fn draw_game_board_bg(&self) {
@@ -125,9 +130,9 @@ impl GameLoopImpl {
             Square::Normal(s) | Square::Ghost(s) => {
                 match s {
                     model::Color::Red => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
-                    model::Color::Green => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
-                    model::Color::Blue => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
-                    model::Color::Yellow => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
+                    model::Color::Green => { comfy::Color { r: SQUARE_GREEN_R, g: SQUARE_GREEN_G, b: SQUARE_GREEN_B, a: 1.0 } },
+                    model::Color::Blue => { comfy::Color { r: SQUARE_BLUE_R, g: SQUARE_BLUE_G, b: SQUARE_BLUE_B, a: 1.0 } },
+                    model::Color::Yellow => { comfy::Color { r: SQUARE_YELLOW_R, g: SQUARE_YELLOW_G, b: SQUARE_YELLOW_B, a: 1.0 } },
                 }
             },
             Square::None => panic!("Unrecognised square"),
@@ -149,13 +154,30 @@ impl GameLoopImpl {
         //draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 }, SQUARES_Z)
 
     }
+
+    fn redraw(&self) {
+        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        self.draw_game_board_bg();
+        let squares = self.game_state.get_board_squares();
+        for (ind, s) in squares.iter().enumerate() {
+            self.draw_square(((ind%WIDTH) as u32, (ind/WIDTH) as u32), s);
+        }
+
+        //self.draw_square((2,1), &Square::Normal(model::Color::Yellow));
+        //self.draw_square((4,0), &Square::Normal(model::Color::Red));
+        //self.draw_square((7,12), &Square::Normal(model::Color::Green));
+    }
+
+    fn next_game_state(&mut self) {
+        self.game_state.next_step(&mut self.game_listner);
+    }
 }
 impl GameLoop for GameLoopImpl{
     fn new(c: &mut EngineState) -> Self {
         let mut game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let mut game_loop = GameLoopImpl{game_state: game_state};     
+        let mut game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, game_listner: GameListenerImpl{}};     
         
         game_loop
     }
@@ -163,16 +185,25 @@ impl GameLoop for GameLoopImpl{
 
 
     fn update(&mut self, _c: &mut EngineContext) {
-        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
-        self.draw_game_board_bg();
-        self.draw_square((2,1), &Square::Normal(model::Color::Yellow));
+        self.time_passed += _c.delta;
+        dbg!(self.time_passed);
 
+        
         if is_key_pressed(KeyCode::Space) {
             //self.y += 1;
         }
+
+        if self.time_passed >= 1.0 {
+            self.time_passed = 0.0;
+            self.next_game_state();
+        }
+        self.redraw();
+
     }
 }
-impl GameListener for GameLoopImpl {
+
+struct GameListenerImpl{}
+impl GameListener for GameListenerImpl {
     fn on_line_cleared(&self, lines_y: Vec<usize>) {
         println!("on_line_cleared: {}", lines_y.len());
     }

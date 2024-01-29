@@ -304,7 +304,7 @@ impl Game {
         piece
     }
 
-    pub fn next_step(&mut self, listener: &dyn GameListener) -> bool {
+    pub fn next_step(&mut self, listener:  &mut dyn GameListener) -> bool {
         if !self.board.move_active_down() {
             self.board.set_active_piece(self.next.pop_back().unwrap());
             listener.on_piece_set();
@@ -325,7 +325,7 @@ impl Game {
         return true;
     }
 
-    pub fn move_down(&mut self, listener: &dyn GameListener) {
+    pub fn move_down(&mut self, listener: &mut dyn GameListener) {
         if !self.board.move_active_down() {
             self.next_step(listener);
         }
