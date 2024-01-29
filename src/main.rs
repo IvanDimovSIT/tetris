@@ -106,7 +106,7 @@ impl GameLoopImpl {
             for sq in i.1.get_squares() {
                 let center = vec2(
                     LOOK_AHEAD_START_DRAW.0+sq.0 as f32*LOOK_AHEAD_SQUARE_SIZE,
-                    LOOK_AHEAD_START_DRAW.1+sq.1 as f32*LOOK_AHEAD_SQUARE_SIZE - i.0 as f32 * LOOK_AHEAD_NEXT_PIECE_OFFSET
+                    LOOK_AHEAD_START_DRAW.1+sq.1 as f32*(-LOOK_AHEAD_SQUARE_SIZE) - i.0 as f32 * LOOK_AHEAD_NEXT_PIECE_OFFSET
                 );
                 self.put_square(center, &Square::Normal(i.1.get_color()), LOOK_AHEAD_SQUARE_SIZE);
             }
