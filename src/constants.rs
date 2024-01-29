@@ -5,6 +5,9 @@ pub const LOOK_AHEAD: i32 = 3;
 pub const WINDOW_WIDTH: u32 = 800;
 pub const WINDOW_HEIGHT: u32 = 800;
 
+pub const MIN_WINDOW_WIDTH: u32 = 750;
+pub const MIN_WINDOW_HEIGHT: u32 = 700;
+
 pub const SQUARE_SIZE: f32 = 1.3;
 pub const SQUARE_SIZE_INNER_COEF: f32 = 0.7;
 
@@ -14,7 +17,7 @@ pub const SCORE_LOCATION: (f32, f32) = (7.5, -10.0);
 pub const SCORE_WIDTH: f32 = 13.0;
 pub const SCORE_HEIGHT: f32 = 3.0;
 pub const SCORE_BG_Z: i32 = 0;
-pub const SCORE_DIGITS: usize = 14;
+pub const SCORE_DIGITS: usize = 13;
 pub const SCORE_FONT_SIZE: f32 = 38.0;
 
 pub const BG_COLOR_R: f32 = 0.4;
