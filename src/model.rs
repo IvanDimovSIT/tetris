@@ -4,9 +4,10 @@ use rand::Rng;
 
 use crate::constants::*;
 
-use self::pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece};
+use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece}};
 
 mod pieces;
+mod piece_generator;
 
 #[derive(Clone, Copy)]
 pub enum Color {
@@ -271,34 +272,19 @@ pub struct Game {
     board: Board,
     score: i32,
     next: VecDeque<Box<dyn Piece>>,
+    piece_generator: PieceGenerator,
 }
 impl Game {
     pub fn new(width: usize, height: usize, look_ahead: i32) -> Result<Game, String> {
-        let pieces = (0..look_ahead).map(|_| {Game::generate_piece(width)}).collect();
-        let board = Board::new(width, height, Game::generate_piece(width));
+        let mut piece_generator = PieceGenerator::new(((width/2) as i32, 0));
+        let pieces = (0..look_ahead).map(|_| {piece_generator.generate_piece()}).collect();
+        let board = Board::new(width, height, piece_generator.generate_piece());
         
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, next: pieces})
+            Ok(Game {board: board.unwrap(), score: 0, next: pieces, piece_generator})
         }
-    }
-
-    fn generate_piece(width: usize) -> Box<dyn Piece> {
-        let mut rng = rand::thread_rng();
-        let position = ((width/2) as i32, 0);
-        let piece: Box<dyn Piece>;
-        match rng.gen_range(0..=5) {
-            0 => {piece = Box::new(SquarePiece::new(position))},
-            1 => {piece = Box::new(LPiece::new(position))},
-            2 => {piece = Box::new(SPiece::new(position))},
-            3 => {piece = Box::new(JPiece::new(position))},
-            4 => {piece = Box::new(ZPiece::new(position))},
-            5 => {piece = Box::new(LinePiece::new(position))},
-            _ => {panic!("Invalid random number")},
-        };
-
-        piece
     }
 
     pub fn get_look_ahead(&self) -> Vec<&dyn Piece> {
@@ -322,7 +308,7 @@ impl Game {
         if !self.board.move_active_down() {
             self.board.set_active_piece(self.next.pop_back().unwrap());
             events.push(GameEvent::PieceSet);
-            self.next.push_front(Game::generate_piece(self.board.width));
+            self.next.push_front(self.piece_generator.generate_piece());
             let cleared_lines = self.board.clear_lines();
             self.update_score(&cleared_lines);                     
             if !cleared_lines.is_empty() {
