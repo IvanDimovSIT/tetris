@@ -60,14 +60,6 @@ impl Board {
         (self.active_piece.get_squares(), self.active_piece.get_color())
     }
 
-    fn get_width(&self) -> usize {
-        self.width
-    }
-
-    fn get_height(&self) -> usize {
-        self.height
-    }
-
     fn set_square(&mut self, position: (usize, usize), square: Square) {
         debug_assert!(position.0 < self.width && position.1 < self.height);
         self.squares[position.0 + position.1*self.width] = square
@@ -286,17 +278,16 @@ pub struct Game {
     score: i32,
     look_ahead: i32,
     next: VecDeque<Box<dyn Piece>>,
-    listener: Box<dyn GameListener>,
 }
 impl Game {
-    pub fn new(width: usize, height: usize, look_ahead: i32, listener: Box<dyn GameListener>) -> Result<Game, String> {
+    pub fn new(width: usize, height: usize, look_ahead: i32) -> Result<Game, String> {
         let pieces = (0..look_ahead).map(|_| {Game::generate_piece(width)}).collect();
         let board = Board::new(width, height, Game::generate_piece(width));
         
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, look_ahead: look_ahead, next: pieces, listener: listener})
+            Ok(Game {board: board.unwrap(), score: 0, look_ahead: look_ahead, next: pieces})
         }
     }
 
@@ -313,16 +304,19 @@ impl Game {
         piece
     }
 
-    pub fn next_step(&mut self) -> bool {
+    pub fn next_step(&mut self, listener: &dyn GameListener) -> bool {
         if !self.board.move_active_down() {
             self.board.set_active_piece(self.next.pop_back().unwrap());
+            listener.on_piece_set();
             self.next.push_front(Game::generate_piece(self.board.width));
             let cleared_lines = self.board.clear_lines();
             self.score += cleared_lines.len() as i32 * 100;                         //update score
-            self.listener.on_line_cleared(cleared_lines);
+            listener.on_line_cleared(cleared_lines);
+            listener.on_score_changed(self.score);
 
             if !self.board.is_active_piece_valid() {
-                self.listener.on_game_over();
+                listener.on_game_over();
+
                 return false;
             }
         }
@@ -331,9 +325,9 @@ impl Game {
         return true;
     }
 
-    pub fn move_down(&mut self) {
+    pub fn move_down(&mut self, listener: &dyn GameListener) {
         if !self.board.move_active_down() {
-            self.next_step();
+            self.next_step(listener);
         }
         self.board.position_ghost_pieces();
     }
@@ -371,17 +365,17 @@ impl Game {
 
         let active = self.board.get_active_piece_squares();
         for i in active.0 {
-            squares[(i.0 + i.1*self.board.get_width() as i32) as usize] = Square::Normal(active.1.clone()); 
+            squares[(i.0 + i.1*self.board.width as i32) as usize] = Square::Normal(active.1.clone()); 
         }
 
         squares
     }
 
     pub fn get_width(&self) -> usize {
-        self.board.get_width()
+        self.board.width
     }
 
     pub fn get_height(&self) -> usize {
-        self.board.get_height()
+        self.board.height
     }
 }
