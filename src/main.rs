@@ -36,17 +36,7 @@ impl GameLoopImpl {
         draw_rect(center, size, BLACK, BOARD_Z);
     }
 
-    fn draw_square(&self, position: (u32, u32), square: &Square) {
-        if let Square::None = square {
-            return;
-        }
-        
-        let center = vec2(
-            GAME_BOARD_TOP_LEFT_POSITION.0 + position.0 as f32 * SQUARE_SIZE, 
-            GAME_BOARD_TOP_LEFT_POSITION.1 - position.1 as f32 * SQUARE_SIZE,
-        );
-        
-        
+    fn put_square(&self, center: Vec2, square: &Square, square_size: f32) {
         let mut color: comfy::Color = match square {
             Square::Normal(s) | Square::Ghost(s) => {
                 match s {
@@ -64,13 +54,26 @@ impl GameLoopImpl {
             color.g *= SQUARE_GHOST_COLOR_COEF;
             color.b *= SQUARE_GHOST_COLOR_COEF;
         }
-        draw_rect(center,  splat(SQUARE_SIZE), color, SQUARES_Z);
+        draw_rect(center,  splat(square_size), color, SQUARES_Z);
 
         color.r *= SQUARE_INNER_COLOR_COEF;
         color.g *= SQUARE_INNER_COLOR_COEF;
         color.b *= SQUARE_INNER_COLOR_COEF;
 
-        draw_rect(center,  splat(SQUARE_SIZE_INNER), color, SQUARES_Z + 1);
+        draw_rect(center,  splat(SQUARE_SIZE_INNER_COEF * square_size), color, SQUARES_Z + 1);
+    }
+
+    fn draw_square(&self, position: (u32, u32), square: &Square) {
+        if let Square::None = square {
+            return;
+        }
+        
+        let center = vec2(
+            GAME_BOARD_TOP_LEFT_POSITION.0 + position.0 as f32 * SQUARE_SIZE, 
+            GAME_BOARD_TOP_LEFT_POSITION.1 - position.1 as f32 * SQUARE_SIZE,
+        );
+        
+        self.put_square(center, square, SQUARE_SIZE);
     }
 
     fn draw_score(&self) {
@@ -89,6 +92,26 @@ impl GameLoopImpl {
         );
     }
 
+    fn draw_look_ahead(&self) {
+        draw_rect(
+            vec2(LOOK_AHEAD_POSITION.0, LOOK_AHEAD_POSITION.1),
+            vec2(LOOK_AHEAD_WIDTH, LOOK_AHEAD_HEIGHT),
+            BLACK,
+            BOARD_Z
+        );
+
+        let next_pieces = self.game_state.get_look_ahead();
+        for i in next_pieces.iter().rev().enumerate() {
+            for sq in i.1.get_squares() {
+                let center = vec2(
+                    LOOK_AHEAD_START_DRAW.0+sq.0 as f32*LOOK_AHEAD_SQUARE_SIZE,
+                    LOOK_AHEAD_START_DRAW.1+sq.1 as f32*LOOK_AHEAD_SQUARE_SIZE - i.0 as f32 * LOOK_AHEAD_NEXT_PIECE_OFFSET
+                );
+                self.put_square(center, &Square::Normal(i.1.get_color()), LOOK_AHEAD_SQUARE_SIZE);
+            }
+        }
+    }
+
     fn redraw(&self) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         self.draw_game_board_bg();
@@ -97,7 +120,7 @@ impl GameLoopImpl {
             self.draw_square(((ind%WIDTH) as u32, (ind/WIDTH) as u32), s);
         }
         self.draw_score();
-
+        self.draw_look_ahead();
     }
 
     fn on_lines_cleared(&mut self, lines: Vec<usize>) {

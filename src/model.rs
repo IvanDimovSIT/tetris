@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 
+use comfy::Itertools;
 use rand::Rng;
 
 use crate::constants::*;
@@ -303,6 +304,11 @@ impl Game {
 
         piece
     }
+
+    pub fn get_look_ahead(&self) -> Vec<&dyn Piece> {
+        self.next.iter().map(|x| -> &dyn Piece {x.as_ref()}).collect()
+    }
+
 
     fn update_score(&mut self, cleared_lines: &Vec<usize>) {
         self.score += match cleared_lines.len() {
