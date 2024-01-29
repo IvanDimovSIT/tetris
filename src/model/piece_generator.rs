@@ -1,6 +1,8 @@
 use rand::seq::SliceRandom;
 use rand::rngs::ThreadRng;
 
+use self::pieces::TPiece;
+
 use super::*;
 
 pub struct PieceGenerator{
@@ -26,6 +28,7 @@ impl PieceGenerator {
             3 => {piece = Box::new(JPiece::new(self.start_position))},
             4 => {piece = Box::new(ZPiece::new(self.start_position))},
             5 => {piece = Box::new(LinePiece::new(self.start_position))},
+            6 => {piece = Box::new(TPiece::new(self.start_position))},
             _ => {panic!("Invalid random number")},
         };
 
@@ -33,7 +36,7 @@ impl PieceGenerator {
     }
 
     fn refill_bag(&mut self) {
-        let mut bag: Vec<i32> = (0..=5).collect();
+        let mut bag: Vec<i32> = (0..=6).collect();
         bag.shuffle(&mut self.rng);
         self.bag = bag;
     }

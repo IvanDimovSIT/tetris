@@ -1,7 +1,4 @@
 use std::collections::VecDeque;
-
-use rand::Rng;
-
 use crate::constants::*;
 
 use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece}};
