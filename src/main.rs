@@ -1,6 +1,7 @@
 mod model;
 mod constants;
 
+use comfy::epaint::FontId;
 use comfy::kira::spatial::listener;
 use comfy::{Color, Rc};
 use comfy::*;
@@ -156,6 +157,22 @@ impl GameLoopImpl {
 
     }
 
+    fn draw_score(&self) {
+        let score = self.game_state.get_score();
+        let score_text = format!("{:0>width$}", score, width = SCORE_DIGITS);
+        draw_rect(vec2(SCORE_LOCATION.0, SCORE_LOCATION.1), vec2(SCORE_WIDTH, SCORE_HEIGHT), BLACK, SCORE_BG_Z);
+        draw_text_ex(
+            &score_text,
+            vec2(SCORE_LOCATION.0, SCORE_LOCATION.1),
+            TextAlign::Center,
+            TextParams { 
+                font:FontId{family: epaint::FontFamily::Proportional, size: SCORE_FONT_SIZE},
+                rotation: 0.0,
+                color: WHITE 
+            }
+        );
+    }
+
     fn redraw(&self) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         self.draw_game_board_bg();
@@ -163,7 +180,7 @@ impl GameLoopImpl {
         for (ind, s) in squares.iter().enumerate() {
             self.draw_square(((ind%WIDTH) as u32, (ind/WIDTH) as u32), s);
         }
-
+        self.draw_score();
         //self.draw_square((2,1), &Square::Normal(model::Color::Yellow));
         //self.draw_square((4,0), &Square::Normal(model::Color::Red));
         //self.draw_square((7,12), &Square::Normal(model::Color::Green));
