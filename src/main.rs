@@ -1,5 +1,5 @@
 mod model;
-mod view;
+mod constants;
 
 use comfy::Color;
 use comfy::*;
@@ -7,29 +7,13 @@ use comfy::EngineState;
 use model::{GameListener, Square};
 
 use crate::model::{Game};
+use crate::constants::*;
+
 use comfy::RED;
 use comfy::simple_game;
 use comfy::vec2;
 use comfy::draw_circle;
 use comfy::GameLoop;
-
-
-const WIDTH: usize = 10;
-const HEIGHT: usize = 20;
-const LOOK_AHEAD: i32 = 3;
-
-const WINDOW_WIDTH: u32 = 800;
-const WINDOW_HEIGHT: u32 = 800;
-
-const SQUARE_SIZE: f32 = 1.3;
-const GAME_BOARD_TOP_LEFT_POSITION: (f32, f32) = (-SQUARE_SIZE*(WIDTH as f32/2.0)-7.0, SQUARE_SIZE*(HEIGHT as f32/2.0)+0.0);
-
-const BG_COLOR_R: f32 = 0.4;
-const BG_COLOR_G: f32 = 0.4;
-const BG_COLOR_B: f32 = 0.9;
-
-const BOARD_Z: i32 = 0;
-const SQUARES_Z: i32 = 1;
 
 /* 
 struct Listener{
@@ -137,31 +121,33 @@ impl GameLoopImpl {
         );
         
         
-        match square {
-            Square::Normal(s) => {
+        let mut color: comfy::Color = match square {
+            Square::Normal(s) | Square::Ghost(s) => {
                 match s {
-                    model::Color::Red => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 1.0, g: 0.5, b: 0.5, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Green => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.5, g: 1.0, b: 0.5, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Blue => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.5, g: 0.5, b: 1.0, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Yellow => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 1.0, g: 1.0, b: 0.5, a: 1.0 }, SQUARES_Z)},
-                    _ => {},
+                    model::Color::Red => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
+                    model::Color::Green => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
+                    model::Color::Blue => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
+                    model::Color::Yellow => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
                 }
             },
-            Square::Ghost(s) => {
-                match s {
-                    model::Color::Red => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.5, g: 0.1, b: 0.1, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Green => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.1, g: 0.5, b: 0.1, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Blue => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.1, g: 0.1, b: 0.5, a: 1.0 }, SQUARES_Z)},
-                    model::Color::Yellow => {draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: 0.5, g: 0.5, b: 0.1, a: 1.0 }, SQUARES_Z)},
-
-                    _ => {},
-                }
-            },
-            _ => {},
+            Square::None => panic!("Unrecognised square"),
+        };
+        
+        if let Square::Ghost(_) = square {
+            color.r *= SQUARE_GHOST_COLOR_COEF;
+            color.g *= SQUARE_GHOST_COLOR_COEF;
+            color.b *= SQUARE_GHOST_COLOR_COEF;
         }
-        
+        draw_rect(center,  splat(SQUARE_SIZE), color, SQUARES_Z);
 
-        
+        color.r *= SQUARE_INNER_COLOR_COEF;
+        color.g *= SQUARE_INNER_COLOR_COEF;
+        color.b *= SQUARE_INNER_COLOR_COEF;
+
+        draw_rect(center,  splat(SQUARE_SIZE_INNER), color, SQUARES_Z + 1);
+
+        //draw_rect(center,  splat(SQUARE_SIZE), comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 }, SQUARES_Z)
+
     }
 }
 impl GameLoop for GameLoopImpl{
