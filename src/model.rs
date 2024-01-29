@@ -233,7 +233,7 @@ impl Board {
             self.set_square((x, row), Square::None);
         }
 
-        for y in (1..row).rev() {
+        for y in (1..=row).rev() {
             for x in 0..self.width {
                 let square_to_add = self.get_square((x, y-1));
                 debug_assert!(square_to_add.is_some());
@@ -252,8 +252,9 @@ impl Board {
             return  lines_to_clear;
         }
 
-        for i in &lines_to_clear {
-            self.clear_line(*i);
+        let row = lines_to_clear.last().unwrap();
+        for _ in &lines_to_clear {
+            self.clear_line(*row);
         }
 
         lines_to_clear

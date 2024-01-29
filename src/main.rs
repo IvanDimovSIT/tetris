@@ -9,6 +9,7 @@ use model::{GameListener, Square};
 
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
+use std::thread::panicking;
 use crate::model::{Game};
 use crate::constants::*;
 
@@ -190,7 +191,28 @@ impl GameLoop for GameLoopImpl{
 
         
         if is_key_pressed(KeyCode::Space) {
-            //self.y += 1;
+            panic!("Unumplemented");
+        }
+
+        if is_key_pressed(KeyCode::Left) || is_key_pressed(KeyCode::A) {
+            self.game_state.move_left();
+        } 
+
+        if is_key_pressed(KeyCode::Right) || is_key_pressed(KeyCode::D) {
+            self.game_state.move_right();
+        }
+
+        if is_key_pressed(KeyCode::Q) || is_key_pressed(KeyCode::Z) {
+            self.game_state.rotate_left();
+        }
+
+        if is_key_pressed(KeyCode::E) || is_key_pressed(KeyCode::X) ||
+            is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
+            self.game_state.rotate_right();
+        }
+
+        if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
+            self.next_game_state();
         }
 
         if self.time_passed >= 1.0 {

@@ -148,10 +148,10 @@ impl LPiece {
         l_piece.squares[0].push((1,2));
 
         l_piece.squares.push(vec![]);
-        l_piece.squares[1].push((0,0));
+        l_piece.squares[1].push((1,0));
+        l_piece.squares[1].push((1,1));
         l_piece.squares[1].push((0,1));
         l_piece.squares[1].push((-1,1));
-        l_piece.squares[1].push((-2,1));
 
         l_piece.squares.push(vec![]);
         l_piece.squares[2].push((0,0));
@@ -161,9 +161,9 @@ impl LPiece {
 
         l_piece.squares.push(vec![]);
         l_piece.squares[3].push((0,0));
-        l_piece.squares[3].push((0,1));
-        l_piece.squares[3].push((0,2));
-        l_piece.squares[3].push((0,1));
+        l_piece.squares[3].push((1,0));
+        l_piece.squares[3].push((-1,0));
+        l_piece.squares[3].push((-1,1));
 
         l_piece
     }
