@@ -4,7 +4,7 @@ use rand::Rng;
 
 use crate::constants::*;
 
-use self::pieces::{LPiece, SquarePiece};
+use self::pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece};
 
 mod pieces;
 
@@ -23,11 +23,6 @@ pub enum Square {
     Ghost(Color),
 }
 
-//pub enum PieceType{
-//    Square,
-//    L,
-//}
-
 pub trait Piece {
     fn get_position(&self) -> (i32, i32);
     fn set_position(&mut self, position: (i32, i32));
@@ -35,7 +30,6 @@ pub trait Piece {
     fn get_squares(&self) -> Vec<(i32, i32)>;
     fn rotate_left(&mut self) -> bool;
     fn rotate_right(&mut self) -> bool;
-    //fn get_type(&self) -> PieceType;
 }
 
 struct Board {
@@ -276,7 +270,6 @@ pub enum GameEvent {
 pub struct Game {
     board: Board,
     score: i32,
-    //look_ahead: i32,
     next: VecDeque<Box<dyn Piece>>,
 }
 impl Game {
@@ -287,7 +280,7 @@ impl Game {
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, /*look_ahead: look_ahead,*/ next: pieces})
+            Ok(Game {board: board.unwrap(), score: 0, next: pieces})
         }
     }
 
@@ -295,9 +288,13 @@ impl Game {
         let mut rng = rand::thread_rng();
         let position = ((width/2) as i32, 0);
         let piece: Box<dyn Piece>;
-        match rng.gen_range(0..=1) {
+        match rng.gen_range(0..=5) {
             0 => {piece = Box::new(SquarePiece::new(position))},
             1 => {piece = Box::new(LPiece::new(position))},
+            2 => {piece = Box::new(SPiece::new(position))},
+            3 => {piece = Box::new(JPiece::new(position))},
+            4 => {piece = Box::new(ZPiece::new(position))},
+            5 => {piece = Box::new(LinePiece::new(position))},
             _ => {panic!("Invalid random number")},
         };
 
@@ -378,10 +375,6 @@ impl Game {
     pub fn get_score(&self) -> i32 {
         self.score
     }
-
-    //pub fn get_next_pieces(&self) -> Vec<PieceType> {
-    //    self.next.iter().map(|x| {x.get_type()}).collect()
-    //}
 
     pub fn get_board_squares(&self) -> Vec<Square> {
         let mut squares = self.board.squares.clone();
