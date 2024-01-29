@@ -20,6 +20,8 @@ struct GameLoopImpl{
     game_state: Game,
     time_passed: f32,
     difficulty: f32,
+    is_game_over: bool,
+    score: i32,
 }
 impl GameLoopImpl {
     fn draw_game_board_bg(&self) {
@@ -77,15 +79,14 @@ impl GameLoopImpl {
     }
 
     fn draw_score(&self) {
-        let score = self.game_state.get_score();
-        let score_text = format!("{:0>width$}", score, width = SCORE_DIGITS);
+        let score_text = format!("{:0>width$}", self.score, width = SCORE_DIGITS);
         draw_rect(vec2(SCORE_LOCATION.0, SCORE_LOCATION.1), vec2(SCORE_WIDTH, SCORE_HEIGHT), BLACK, SCORE_BG_Z);
         draw_text_ex(
             &score_text,
             vec2(SCORE_LOCATION.0, SCORE_LOCATION.1),
             TextAlign::Center,
             TextParams { 
-                font:FontId{family: epaint::FontFamily::Proportional, size: SCORE_FONT_SIZE},
+                font:FontId{family: epaint::FontFamily::Monospace, size: SCORE_FONT_SIZE},
                 rotation: 0.0,
                 color: WHITE 
             }
@@ -130,6 +131,7 @@ impl GameLoopImpl {
 
         println!("cleared lines:{}", lines.len());
         self.difficulty += DIFFICULTY_INCREASE;
+        self.score = self.game_state.get_score();
     }
 
     fn handle_rotate_left(&mut self){
@@ -181,12 +183,29 @@ impl GameLoopImpl {
         self.handle_game_events(events);
     }
 
+    fn draw_game_over(&self) {
+        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        draw_text_ex(
+            format!("Game Over! Score:{}", self.score).as_str(),
+            splat(0.0),
+            TextAlign::Center,
+            TextParams{
+                font: FontId { 
+                    size: GAME_OVER_TEXT_SIZE,
+                    family: epaint::FontFamily::Proportional,
+                },
+                rotation: 0.0,
+                color: WHITE 
+            }
+        );
+    }
+
     fn handle_game_events(&mut self, events: Vec<GameEvent>){
         for i in events {
             match i {
                 GameEvent::GameOver(score) => {
                     println!("Game over! score:{score}");
-                    todo!("display score and exit game");
+                    self.is_game_over = true;
                 },
                 GameEvent::PieceSet => {
                     println!("Piece set")
@@ -203,12 +222,17 @@ impl GameLoop for GameLoopImpl{
         let game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY};     
+        let game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY, is_game_over: false, score: 0};     
         
         game_loop
     }
 
     fn update(&mut self, _c: &mut EngineContext) {
+        if self.is_game_over {
+            self.draw_game_over();
+            return;
+        }
+
         self.time_passed += _c.delta;
         dbg!(self.time_passed);
         let mut game_events: Vec<GameEvent> = vec![];
