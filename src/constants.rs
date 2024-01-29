@@ -46,3 +46,8 @@ pub const SQUARES_Z: i32 = 1;
 
 pub const START_DIFFICULTY: f32 = 1.0;
 pub const DIFFICULTY_INCREASE: f32 = 0.1;
+
+pub const SCORE_REWARD_LINES1: i32 = 100;
+pub const SCORE_REWARD_LINES2: i32 = 200;
+pub const SCORE_REWARD_LINES3: i32 = 400;
+pub const SCORE_REWARD_LINES4: i32 = 800;

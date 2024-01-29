@@ -1,7 +1,8 @@
 use std::collections::VecDeque;
 
-use comfy::notify::{event, Event};
 use rand::Rng;
+
+use crate::constants::*;
 
 use self::pieces::{LPiece, SquarePiece};
 
@@ -266,14 +267,6 @@ impl Board {
     }
 }
 
-/* 
-pub trait GameListener {
-    fn on_line_cleared(&self, lines_y: Vec<usize>);
-    fn on_game_over(&self);
-    fn on_piece_set(&self);
-    fn on_score_changed(&self, score: i32);
-}
-*/
 pub enum GameEvent {
     LinesCleared(Vec<usize>),
     GameOver(i32),
@@ -311,6 +304,16 @@ impl Game {
         piece
     }
 
+    fn update_score(&mut self, cleared_lines: &Vec<usize>) {
+        self.score += match cleared_lines.len() {
+            1 => {SCORE_REWARD_LINES1},
+            2 => {SCORE_REWARD_LINES2},
+            3 => {SCORE_REWARD_LINES3},
+            4 => {SCORE_REWARD_LINES4},
+            _ => {0},
+        }
+    }
+
     pub fn next_step(&mut self) -> Vec<GameEvent> {
         let mut events: Vec<GameEvent> = vec![];
 
@@ -319,7 +322,7 @@ impl Game {
             events.push(GameEvent::PieceSet);
             self.next.push_front(Game::generate_piece(self.board.width));
             let cleared_lines = self.board.clear_lines();
-            self.score += cleared_lines.len() as i32 * 100;                         //update score
+            self.update_score(&cleared_lines);                     
             if !cleared_lines.is_empty() {
                 events.push(GameEvent::LinesCleared(cleared_lines.clone()));
             }
