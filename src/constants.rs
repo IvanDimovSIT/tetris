@@ -76,3 +76,9 @@ pub const LIGHT_EFFECT: f32 = 0.2;
 pub const CLEAR_EFFECT_Z: i32 = 2;
 pub const CLEAR_EFFECT_DELAY: f32 = 0.15;
 
+pub const PLACE_SOUND_TAG: &str = "Place";
+pub const CLEAR_SOUND_TAG: &str = "Clear";
+pub const GAMEOVER_SOUND_TAG: &str = "GameOver";
+pub const CANTSWAP_SOUND_TAG: &str = "CantSwap";
+pub const SWAP_SOUND_TAG: &str = "Swap";
+pub const ROTATE_SOUND_TAG: &str = "Rotate";

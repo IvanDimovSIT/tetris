@@ -155,6 +155,7 @@ impl GameLoopImpl {
         if lines.is_empty() {
             return;
         }
+        play_sound(CLEAR_SOUND_TAG);
 
         println!("cleared lines:{}", lines.len());
         self.difficulty += DIFFICULTY_INCREASE;
@@ -178,10 +179,14 @@ impl GameLoopImpl {
     fn handle_rotate_left(&mut self){
         let result = self.game_state.rotate_left();
         if result {
+            play_sound(ROTATE_SOUND_TAG);
             return;
         }
+
+        
         if self.game_state.move_left() {
             if self.game_state.rotate_left() {
+                play_sound(ROTATE_SOUND_TAG);
                 return;
             }else{
                 assert!(self.game_state.move_right());
@@ -189,6 +194,7 @@ impl GameLoopImpl {
         }
         if self.game_state.move_right() {
             if self.game_state.rotate_left() {
+                play_sound(ROTATE_SOUND_TAG);
                 return;
             }else{
                 assert!(self.game_state.move_left());
@@ -199,10 +205,14 @@ impl GameLoopImpl {
     fn handle_rotate_right(&mut self){
         let result = self.game_state.rotate_right();
         if result {
+            play_sound(ROTATE_SOUND_TAG);
             return;
         }
+
+        play_sound(ROTATE_SOUND_TAG);
         if self.game_state.move_left() {
             if self.game_state.rotate_right() {
+                play_sound(ROTATE_SOUND_TAG);
                 return;
             }else{
                 assert!(self.game_state.move_right());
@@ -210,6 +220,7 @@ impl GameLoopImpl {
         }
         if self.game_state.move_right() {
             if self.game_state.rotate_right() {
+                play_sound(ROTATE_SOUND_TAG);
                 return;
             }else{
                 assert!(self.game_state.move_left());
@@ -218,7 +229,12 @@ impl GameLoopImpl {
     }
 
     fn handle_swap_piece(&mut self) {
-        let _result = self.game_state.swap_held();
+        let result = self.game_state.swap_held();
+        if result {
+            play_sound(SWAP_SOUND_TAG);
+        }else{
+            play_sound(CANTSWAP_SOUND_TAG);
+        }
     }
 
     fn handle_set_piece(&mut self){
@@ -262,10 +278,12 @@ impl GameLoopImpl {
             match i {
                 GameEvent::GameOver(score) => {
                     println!("Game over! score:{score}");
+                    play_sound(GAMEOVER_SOUND_TAG);
                     self.is_game_over = true;
                 },
                 GameEvent::PieceSet => {
-                    println!("Piece set")
+                    println!("Piece set");
+                    play_sound(PLACE_SOUND_TAG);
                 },
                 GameEvent::LinesCleared(lines) => {self.on_lines_cleared(lines)},
                 _ => {},
@@ -374,6 +392,59 @@ pub async fn run() {
     let mut engine = EngineState::new();
 
     let game = GameLoopImpl::new(&mut engine);
+    load_sound_from_bytes(
+        PLACE_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/place.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        SWAP_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/swap.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        CANTSWAP_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/cantswap.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        CLEAR_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/clear.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+    
+    load_sound_from_bytes(
+        GAMEOVER_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/gameover.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        ROTATE_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/rotate.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
 
     run_comfy_main_async(game, engine).await;
 }
