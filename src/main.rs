@@ -1,6 +1,6 @@
 mod model;
 mod constants;
-
+mod view;
 
 use comfy::epaint::FontId;
 
@@ -11,6 +11,7 @@ use model::Square;
 use crate::model::Game;
 use crate::constants::*;
 use crate::model::GameEvent;
+use crate::view::ClearEffect;
 
 use comfy::vec2;
 
@@ -22,6 +23,7 @@ struct GameLoopImpl{
     difficulty: f32,
     is_game_over: bool,
     score: i32,
+    effects: Vec<ClearEffect>,
 }
 impl GameLoopImpl {
     fn draw_game_board_bg(&self) {
@@ -136,7 +138,7 @@ impl GameLoopImpl {
         }
     }
 
-    fn redraw(&self) {
+    fn redraw(&mut self, c: &mut EngineContext) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         self.draw_game_board_bg();
         let squares = self.game_state.get_board_squares();
@@ -146,6 +148,7 @@ impl GameLoopImpl {
         self.draw_score();
         self.draw_look_ahead();
         self.draw_held();
+        self.draw_effects(c.delta);
     }
 
     fn on_lines_cleared(&mut self, lines: Vec<usize>) {
@@ -156,6 +159,20 @@ impl GameLoopImpl {
         println!("cleared lines:{}", lines.len());
         self.difficulty += DIFFICULTY_INCREASE;
         self.score = self.game_state.get_score();
+
+        for i in lines {
+            let center = vec2(
+                GAME_BOARD_TOP_LEFT_POSITION.0 + WIDTH as f32 * SQUARE_SIZE as f32 / 2.0 - SQUARE_SIZE/2.0,
+                GAME_BOARD_TOP_LEFT_POSITION.1 - i as f32 * SQUARE_SIZE);
+
+            self.effects.push(
+                ClearEffect::new(
+                    center,
+                    vec2(SQUARE_SIZE*WIDTH as f32, SQUARE_SIZE),
+                    CLEAR_EFFECT_DELAY
+                )
+            );
+        }
     }
 
     fn handle_rotate_left(&mut self){
@@ -228,6 +245,18 @@ impl GameLoopImpl {
         );
     }
 
+    fn draw_effects(&mut self, delta: f32) {
+        for i in &mut self.effects {
+            i.draw(delta);
+        }
+
+        self.effects = self.effects
+            .iter()
+            .filter(|x| {!x.is_complete()})
+            .map(|x| {*x})
+            .collect();
+    }
+
     fn handle_game_events(&mut self, events: Vec<GameEvent>){
         for i in events {
             match i {
@@ -250,18 +279,25 @@ impl GameLoop for GameLoopImpl{
         let game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let game_loop = GameLoopImpl{game_state: game_state, time_passed: 1.0, difficulty: START_DIFFICULTY, is_game_over: false, score: 0};     
+        let game_loop = GameLoopImpl{
+            game_state: game_state,
+            time_passed: 1.0,
+            difficulty: START_DIFFICULTY,
+            is_game_over: false,
+            score: 0,
+            effects: vec![],
+        };     
         
         game_loop
     }
 
-    fn update(&mut self, _c: &mut EngineContext) {
+    fn update(&mut self, c: &mut EngineContext) {
         if self.is_game_over {
             self.draw_game_over();
             return;
         }
 
-        self.time_passed += _c.delta;
+        self.time_passed += c.delta;
         dbg!(self.time_passed);
         let mut game_events: Vec<GameEvent> = vec![];
         
@@ -311,7 +347,7 @@ impl GameLoop for GameLoopImpl{
                 game_events.push(i);
             }
         }
-        self.redraw();
+        self.redraw(c);
         self.handle_game_events(game_events);
     }
 }

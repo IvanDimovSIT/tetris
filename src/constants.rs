@@ -72,3 +72,7 @@ pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 2.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = 1.5; 
 
 pub const LIGHT_EFFECT: f32 = 0.2;
+
+pub const CLEAR_EFFECT_Z: i32 = 2;
+pub const CLEAR_EFFECT_DELAY: f32 = 0.15;
+
