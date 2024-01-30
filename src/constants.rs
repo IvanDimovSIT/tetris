@@ -20,26 +20,26 @@ pub const SCORE_BG_Z: i32 = 0;
 pub const SCORE_DIGITS: usize = 13;
 pub const SCORE_FONT_SIZE: f32 = 38.0;
 
-pub const BG_COLOR_R: f32 = 0.4;
-pub const BG_COLOR_G: f32 = 0.4;
-pub const BG_COLOR_B: f32 = 0.9;
+pub const BG_COLOR_R: f32 = 0.3;
+pub const BG_COLOR_G: f32 = 0.3;
+pub const BG_COLOR_B: f32 = 0.8;
 
 
 pub const SQUARE_RED_R: f32 = 1.0;
-pub const SQUARE_RED_G: f32 = 0.3;
-pub const SQUARE_RED_B: f32 = 0.3;
+pub const SQUARE_RED_G: f32 = 0.1;
+pub const SQUARE_RED_B: f32 = 0.1;
 
-pub const SQUARE_GREEN_R: f32 = 0.3;
-pub const SQUARE_GREEN_G: f32 = 1.0;
-pub const SQUARE_GREEN_B: f32 = 0.3;
+pub const SQUARE_GREEN_R: f32 = 0.0;
+pub const SQUARE_GREEN_G: f32 = 0.8;
+pub const SQUARE_GREEN_B: f32 = 0.0;
 
-pub const SQUARE_BLUE_R: f32 = 0.3;
-pub const SQUARE_BLUE_G: f32 = 0.3;
+pub const SQUARE_BLUE_R: f32 = 0.1;
+pub const SQUARE_BLUE_G: f32 = 0.1;
 pub const SQUARE_BLUE_B: f32 = 1.0;
 
-pub const SQUARE_YELLOW_R: f32 = 1.0;
-pub const SQUARE_YELLOW_G: f32 = 1.0;
-pub const SQUARE_YELLOW_B: f32 = 0.3;
+pub const SQUARE_YELLOW_R: f32 = 0.5;
+pub const SQUARE_YELLOW_G: f32 = 0.5;
+pub const SQUARE_YELLOW_B: f32 = 0.0;
 
 pub const SQUARE_INNER_COLOR_COEF: f32 = 0.6;
 pub const SQUARE_GHOST_COLOR_COEF: f32 = 0.4;
@@ -71,3 +71,4 @@ pub const GAME_OVER_TEXT_SIZE: f32 = 48.0;
 pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 2.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = 1.5; 
 
+pub const LIGHT_EFFECT: f32 = 0.2;

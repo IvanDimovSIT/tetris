@@ -321,6 +321,9 @@ pub fn _comfy_default_config(config: GameConfig) -> GameConfig {
     let mut new_config = config.clone();
     new_config.resolution = ResolutionConfig::Logical(WINDOW_WIDTH, WINDOW_HEIGHT);
     new_config.min_resolution = ResolutionConfig::Logical(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
+    new_config.bloom_enabled = true;
+    new_config.tonemapping_enabled = true;
+    new_config.lighting.bloom_lerp = LIGHT_EFFECT;
 
     new_config
 }
