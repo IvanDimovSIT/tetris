@@ -7,6 +7,7 @@ use comfy::epaint::FontId;
 use comfy::*;
 use comfy::EngineState;
 use model::Square;
+use view::load_sounds;
 
 use crate::model::Game;
 use crate::constants::*;
@@ -209,7 +210,6 @@ impl GameLoopImpl {
             return;
         }
 
-        play_sound(ROTATE_SOUND_TAG);
         if self.game_state.move_left() {
             if self.game_state.rotate_right() {
                 play_sound(ROTATE_SOUND_TAG);
@@ -234,6 +234,18 @@ impl GameLoopImpl {
             play_sound(SWAP_SOUND_TAG);
         }else{
             play_sound(CANTSWAP_SOUND_TAG);
+        }
+    }
+
+    fn handle_move_left(&mut self) {
+        if self.game_state.move_left() {
+            play_sound(MOVE_SOUND_TAG);
+        }
+    }
+
+    fn handle_move_right(&mut self) {
+        if self.game_state.move_right() {
+            play_sound(MOVE_SOUND_TAG);
         }
     }
 
@@ -316,7 +328,7 @@ impl GameLoop for GameLoopImpl{
         }
 
         self.time_passed += c.delta;
-        dbg!(self.time_passed);
+
         let mut game_events: Vec<GameEvent> = vec![];
         
         if is_key_pressed(KeyCode::Space) {
@@ -324,11 +336,11 @@ impl GameLoop for GameLoopImpl{
         }
 
         if is_key_pressed(KeyCode::Left) || is_key_pressed(KeyCode::A) {
-            self.game_state.move_left();
+            self.handle_move_left();
         } 
 
         if is_key_pressed(KeyCode::Right) || is_key_pressed(KeyCode::D) {
-            self.game_state.move_right();
+            self.handle_move_right();
         }
 
         if is_key_pressed(KeyCode::Z) {
@@ -392,59 +404,7 @@ pub async fn run() {
     let mut engine = EngineState::new();
 
     let game = GameLoopImpl::new(&mut engine);
-    load_sound_from_bytes(
-        PLACE_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/place.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
-
-    load_sound_from_bytes(
-        SWAP_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/swap.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
-
-    load_sound_from_bytes(
-        CANTSWAP_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/cantswap.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
-
-    load_sound_from_bytes(
-        CLEAR_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/clear.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
-    
-    load_sound_from_bytes(
-        GAMEOVER_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/gameover.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
-
-    load_sound_from_bytes(
-        ROTATE_SOUND_TAG,
-        include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/rotate.wav"
-        )),
-        StaticSoundSettings::default(),
-    );
+    load_sounds();
 
     run_comfy_main_async(game, engine).await;
 }

@@ -1,4 +1,4 @@
-use comfy::{draw_rect, Color, Vec2};
+use comfy::{draw_rect, load_sound_from_bytes, Color, StaticSoundSettings, Vec2};
 
 use crate::constants::*;
 
@@ -38,3 +38,67 @@ impl ClearEffect {
     }
 }
 
+pub fn load_sounds() {
+    load_sound_from_bytes(
+        PLACE_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/place.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        SWAP_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/swap.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        CANTSWAP_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/cantswap.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        CLEAR_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/clear.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+    
+    load_sound_from_bytes(
+        GAMEOVER_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/gameover.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        ROTATE_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/rotate.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+
+    load_sound_from_bytes(
+        MOVE_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/move.wav"
+        )),
+        StaticSoundSettings::default(),
+    );
+}

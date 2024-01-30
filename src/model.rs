@@ -425,15 +425,19 @@ impl Game {
 
     pub fn rotate_left(&mut self) -> bool {
         let result = self.board.rotate_active_left();
-        self.board.position_ghost_pieces();
+        if result {
+            self.board.position_ghost_pieces();
+        }
 
         result
     }
 
     pub fn rotate_right(&mut self) -> bool {
         let result = self.board.rotate_active_right();
-        self.board.position_ghost_pieces();
-
+        if result {
+            self.board.position_ghost_pieces();
+        }
+        
         result
     }
 

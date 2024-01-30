@@ -48,7 +48,7 @@ pub const BOARD_Z: i32 = 0;
 pub const SQUARES_Z: i32 = 1;
 
 pub const START_DIFFICULTY: f32 = 1.0;
-pub const DIFFICULTY_INCREASE: f32 = 0.1;
+pub const DIFFICULTY_INCREASE: f32 = 0.18;
 
 pub const SCORE_REWARD_LINES1: i32 = 100;
 pub const SCORE_REWARD_LINES2: i32 = 200;
@@ -68,10 +68,10 @@ pub const HELD_PIECE_SQUARE_SIZE: f32 = 1.2;
 
 pub const GAME_OVER_TEXT_SIZE: f32 = 48.0;
 
-pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 2.0;
+pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 3.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = 1.5; 
 
-pub const LIGHT_EFFECT: f32 = 0.2;
+pub const LIGHT_EFFECT: f32 = 0.25;
 
 pub const CLEAR_EFFECT_Z: i32 = 2;
 pub const CLEAR_EFFECT_DELAY: f32 = 0.15;
@@ -82,3 +82,4 @@ pub const GAMEOVER_SOUND_TAG: &str = "GameOver";
 pub const CANTSWAP_SOUND_TAG: &str = "CantSwap";
 pub const SWAP_SOUND_TAG: &str = "Swap";
 pub const ROTATE_SOUND_TAG: &str = "Rotate";
+pub const MOVE_SOUND_TAG: &str = "Move";
