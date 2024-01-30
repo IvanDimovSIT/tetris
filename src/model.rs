@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use crate::constants::*;
 
-use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece}};
+use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece, TPiece}};
 
 mod pieces;
 mod piece_generator;
@@ -21,6 +21,30 @@ pub enum Square {
     Ghost(Color),
 }
 
+
+pub enum PieceType {
+    SquarePiece,
+    LPiece,
+    JPiece,
+    SPiece,
+    ZPiece,
+    TPiece,
+    LinePiece
+}
+impl PieceType {
+    pub fn create(&self, start_position: (i32, i32)) -> Box<dyn Piece> {
+        match self {
+            Self::LPiece => {Box::new(LPiece::new(start_position))},
+            Self::JPiece => {Box::new(JPiece::new(start_position))},
+            Self::SPiece => {Box::new(SPiece::new(start_position))},
+            Self::ZPiece => {Box::new(ZPiece::new(start_position))},
+            Self::TPiece => {Box::new(TPiece::new(start_position))},
+            Self::LinePiece => {Box::new(LinePiece::new(start_position))},
+            Self::SquarePiece => {Box::new(SquarePiece::new(start_position))},
+        }
+    }
+}
+
 pub trait Piece {
     fn get_position(&self) -> (i32, i32);
     fn set_position(&mut self, position: (i32, i32));
@@ -28,6 +52,7 @@ pub trait Piece {
     fn get_squares(&self) -> Vec<(i32, i32)>;
     fn rotate_left(&mut self) -> bool;
     fn rotate_right(&mut self) -> bool;
+    fn get_type(&self) -> PieceType;
 }
 
 struct Board {
@@ -94,7 +119,10 @@ impl Board {
     }  
 
     fn move_active_down(&mut self) -> bool {
-        debug_assert!(self.is_active_piece_valid());
+        if !self.is_active_piece_valid() {
+            return false;
+        }
+
         let pos = self.active_piece.get_position();
         self.active_piece.set_position((pos.0, pos.1+1));
         
@@ -282,6 +310,8 @@ pub struct Game {
     board: Board,
     score: i32,
     next: VecDeque<Box<dyn Piece>>,
+    held: Option<Box<dyn Piece>>,
+    has_swaped: bool,
     piece_generator: PieceGenerator,
 }
 impl Game {
@@ -293,7 +323,7 @@ impl Game {
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, next: pieces, piece_generator})
+            Ok(Game {board: board.unwrap(), score: 0, next: pieces, held: None, has_swaped: false, piece_generator})
         }
     }
 
@@ -316,6 +346,7 @@ impl Game {
         let mut events: Vec<GameEvent> = vec![];
 
         if !self.board.move_active_down() {
+            self.has_swaped = false;
             self.board.set_active_piece(self.next.pop_back().unwrap());
             events.push(GameEvent::PieceSet);
             self.next.push_front(self.piece_generator.generate_piece());
@@ -334,9 +365,38 @@ impl Game {
         return events;
     }
 
+    pub fn get_held(&self) -> Option<(Vec<(i32, i32)>, Color)> {
+        if let Some(piece) = &self.held {
+            Some((piece.get_squares(), piece.get_color()))
+        }else{
+            None
+        }
+    }
+
+    pub fn swap_held(&mut self) -> bool {
+        if self.has_swaped {
+            return false;
+        }
+        self.has_swaped = true;
+
+        let start_position = (self.board.width as i32/2,0);
+        if self.held.is_none() {
+            self.held = Some(self.board.active_piece.get_type().create(start_position));
+            self.board.active_piece = self.next.pop_back().unwrap();
+            self.next.push_front(self.piece_generator.generate_piece());
+        }else {
+            let held_type = self.held.as_ref().unwrap().get_type();
+            self.held = Some(self.board.active_piece.get_type().create(start_position));
+            self.board.active_piece = held_type.create(start_position);
+        }
+        self.board.position_ghost_pieces();
+
+        true
+    }
+
     pub fn can_move_down(&mut self) -> bool {
         if self.board.move_active_down() {
-            assert!(self.board.move_active_up());
+            debug_assert!(self.board.move_active_up());
             true
         }else{
             false

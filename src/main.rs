@@ -113,6 +113,29 @@ impl GameLoopImpl {
         }
     }
 
+    fn draw_held(&self) {
+        draw_rect(
+            vec2(HELD_PIECE_POSITION.0, HELD_PIECE_POSITION.1),
+            splat(HELD_PIECE_BG_SIZE),
+            BLACK,
+            BOARD_Z
+        );
+
+        let held = self.game_state.get_held();
+        if held.is_none() {
+            return;
+        }
+
+        let (squares, color) = held.unwrap();
+        for i in squares {
+            let center = vec2(
+                HELD_PIECE_POSITION.0 + i.0 as f32 * HELD_PIECE_SQUARE_SIZE - HELD_PIECE_BG_SIZE/1.2,
+                HELD_PIECE_POSITION.1 - i.1 as f32 * HELD_PIECE_SQUARE_SIZE + HELD_PIECE_BG_SIZE/5.0
+            );
+            self.put_square(center, &Square::Normal(color), HELD_PIECE_SQUARE_SIZE);
+        }
+    }
+
     fn redraw(&self) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         self.draw_game_board_bg();
@@ -122,6 +145,7 @@ impl GameLoopImpl {
         }
         self.draw_score();
         self.draw_look_ahead();
+        self.draw_held();
     }
 
     fn on_lines_cleared(&mut self, lines: Vec<usize>) {
@@ -174,6 +198,10 @@ impl GameLoopImpl {
                 assert!(self.game_state.move_left());
             }
         }
+    }
+
+    fn handle_swap_piece(&mut self) {
+        let _result = self.game_state.swap_held();
     }
 
     fn handle_set_piece(&mut self){
@@ -249,20 +277,21 @@ impl GameLoop for GameLoopImpl{
             self.game_state.move_right();
         }
 
-        if is_key_pressed(KeyCode::Q) || is_key_pressed(KeyCode::Z) {
+        if is_key_pressed(KeyCode::Z) {
             self.handle_rotate_left();
         }
 
-        if is_key_pressed(KeyCode::E) || is_key_pressed(KeyCode::X) ||
-            is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
+        if is_key_pressed(KeyCode::X) || is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
             self.handle_rotate_right();
+        }
+
+        if is_key_pressed(KeyCode::E) {
+            self.handle_swap_piece();
         }
 
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
             let received = self.game_state.next_step();
-            for i in received {
-                game_events.push(i);
-            }
+            self.handle_game_events(received);
         }
 
         let mut step_delay = if self.game_state.can_move_down() {

@@ -1,6 +1,6 @@
 use crate::model::Piece;
 
-use super::Color;
+use super::{Color, PieceType};
 
 pub struct SquarePiece {
     position: (i32, i32),
@@ -34,6 +34,10 @@ impl Piece for SquarePiece {
 
     fn rotate_right(&mut self) -> bool {
         false
+    }
+
+    fn get_type(&self) -> PieceType {
+        PieceType::SquarePiece
     }
 }
 impl SquarePiece {
@@ -128,6 +132,9 @@ impl Piece for LPiece {
         true
     }
 
+    fn get_type(&self) -> PieceType {
+        PieceType::LPiece
+    }
 }
 impl LPiece {
     pub fn new(position: (i32, i32)) -> LPiece {
@@ -207,6 +214,10 @@ impl Piece for SPiece {
         true
     }
 
+    fn get_type(&self) -> PieceType {
+        PieceType::SPiece
+    }
+
 }
 impl SPiece {
     pub fn new(position: (i32, i32)) -> SPiece {
@@ -226,6 +237,7 @@ impl SPiece {
         s_piece
     }
 }
+
 
 
 pub struct JPiece {
@@ -278,6 +290,10 @@ impl Piece for JPiece {
         self.rotation.rotate_left();
 
         true
+    }
+
+    fn get_type(&self) -> PieceType {
+        PieceType::JPiece
     }
 
 }
@@ -359,6 +375,9 @@ impl Piece for ZPiece {
         true
     }
 
+    fn get_type(&self) -> PieceType {
+        PieceType::ZPiece
+    }
 }
 impl ZPiece {
     pub fn new(position: (i32, i32)) -> ZPiece {
@@ -378,6 +397,7 @@ impl ZPiece {
         z_piece
     }
 }
+
 
 pub struct LinePiece {
     position: (i32, i32),
@@ -425,6 +445,9 @@ impl Piece for LinePiece {
         true
     }
 
+    fn get_type(&self) -> PieceType {
+        PieceType::LinePiece
+    }
 }
 impl LinePiece {
     pub fn new(position: (i32, i32)) -> LinePiece {
@@ -498,6 +521,9 @@ impl Piece for TPiece {
         true
     }
 
+    fn get_type(&self) -> PieceType {
+        PieceType::TPiece
+    }
 }
 impl TPiece {
     pub fn new(position: (i32, i32)) -> TPiece {
