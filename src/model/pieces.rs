@@ -37,7 +37,7 @@ impl Piece for SquarePiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::SquarePiece
+        PieceType::Square
     }
 }
 impl SquarePiece {
@@ -133,7 +133,7 @@ impl Piece for LPiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::LPiece
+        PieceType::L
     }
 }
 impl LPiece {
@@ -215,7 +215,7 @@ impl Piece for SPiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::SPiece
+        PieceType::S
     }
 
 }
@@ -293,7 +293,7 @@ impl Piece for JPiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::JPiece
+        PieceType::J
     }
 
 }
@@ -376,7 +376,7 @@ impl Piece for ZPiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::ZPiece
+        PieceType::Z
     }
 }
 impl ZPiece {
@@ -446,7 +446,7 @@ impl Piece for LinePiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::LinePiece
+        PieceType::Line
     }
 }
 impl LinePiece {
@@ -522,7 +522,7 @@ impl Piece for TPiece {
     }
 
     fn get_type(&self) -> PieceType {
-        PieceType::TPiece
+        PieceType::T
     }
 }
 impl TPiece {

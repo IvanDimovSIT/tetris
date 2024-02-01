@@ -75,8 +75,9 @@ pub const RESULTS_TEXT_SIZE: f32 = 22.0;
 pub const RESULTS_SIZE: (f32, f32) = (500.0, 300.0);
 
 
-pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 3.0;
-pub const PLACE_PIECE_DELAY_MAX: f32 = 1.5; 
+pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 4.0;
+pub const BASE_PIECE_FALL_SPEED: f32 = 2.0;
+pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED; 
 
 pub const LIGHT_EFFECT: f32 = 0.25;
 

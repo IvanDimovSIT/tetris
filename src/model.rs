@@ -23,24 +23,24 @@ pub enum Square {
 
 
 pub enum PieceType {
-    SquarePiece,
-    LPiece,
-    JPiece,
-    SPiece,
-    ZPiece,
-    TPiece,
-    LinePiece
+    Square,
+    L,
+    J,
+    S,
+    Z,
+    T,
+    Line
 }
 impl PieceType {
     pub fn create(&self, start_position: (i32, i32)) -> Box<dyn Piece> {
         match self {
-            Self::LPiece => {Box::new(LPiece::new(start_position))},
-            Self::JPiece => {Box::new(JPiece::new(start_position))},
-            Self::SPiece => {Box::new(SPiece::new(start_position))},
-            Self::ZPiece => {Box::new(ZPiece::new(start_position))},
-            Self::TPiece => {Box::new(TPiece::new(start_position))},
-            Self::LinePiece => {Box::new(LinePiece::new(start_position))},
-            Self::SquarePiece => {Box::new(SquarePiece::new(start_position))},
+            Self::L => {Box::new(LPiece::new(start_position))},
+            Self::J => {Box::new(JPiece::new(start_position))},
+            Self::S => {Box::new(SPiece::new(start_position))},
+            Self::Z => {Box::new(ZPiece::new(start_position))},
+            Self::T => {Box::new(TPiece::new(start_position))},
+            Self::Line => {Box::new(LinePiece::new(start_position))},
+            Self::Square => {Box::new(SquarePiece::new(start_position))},
         }
     }
 }

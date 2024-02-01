@@ -27,7 +27,7 @@ impl ClearEffect {
                 r: 1.0,
                 g: 1.0,
                 b: 1.0,
-                a: self.time/(self.delay) 
+                a: self.time/self.delay
             },
             CLEAR_EFFECT_Z
         );

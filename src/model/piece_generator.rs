@@ -24,13 +24,13 @@ impl PieceGenerator {
 
     fn refill_bag(&mut self) {
         let mut bag: Vec<PieceType> = vec![
-            PieceType::LPiece,
-            PieceType::SPiece,
-            PieceType::ZPiece,
-            PieceType::JPiece,
-            PieceType::TPiece,
-            PieceType::LinePiece,
-            PieceType::SquarePiece
+            PieceType::L,
+            PieceType::S,
+            PieceType::Z,
+            PieceType::J,
+            PieceType::T,
+            PieceType::Line,
+            PieceType::Square
         ];
         bag.shuffle(&mut self.rng);
         self.bag = bag;

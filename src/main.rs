@@ -8,7 +8,7 @@ use comfy::*;
 use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::SystemTime;
 
 use crate::model::Game;
 use crate::constants::*;
@@ -50,6 +50,7 @@ struct GameLoopImpl{
     game_stats: GameStats
 }
 impl GameLoopImpl {
+
     fn draw_game_board_bg(&self) {
         let center = vec2(
             GAME_BOARD_TOP_LEFT_POSITION.0 + (WIDTH/2) as f32 * SQUARE_SIZE - SQUARE_SIZE/2.0,
@@ -172,7 +173,7 @@ impl GameLoopImpl {
         }
     }
 
-    fn redraw(&mut self, c: &mut EngineContext) {
+    fn redraw(&mut self, delta: f32) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         self.draw_game_board_bg();
         let squares = self.game_state.get_board_squares();
@@ -182,7 +183,7 @@ impl GameLoopImpl {
         self.draw_score();
         self.draw_look_ahead();
         self.draw_held();
-        self.draw_effects(c.delta);
+        self.draw_effects(delta);
     }
 
     fn on_lines_cleared(&mut self, lines: Vec<usize>) {
@@ -397,7 +398,8 @@ impl GameLoop for GameLoopImpl{
             self.draw_game_over();
             return;
         }
-        self.time_passed += c.delta;
+        let delta = c.delta;
+        self.time_passed += delta;
 
         let mut game_events: Vec<GameEvent> = vec![];
         
@@ -431,9 +433,9 @@ impl GameLoop for GameLoopImpl{
         }
 
         let mut step_delay = if self.game_state.can_move_down() {
-            1.0/self.difficulty
+            BASE_PIECE_FALL_SPEED/self.difficulty
         }else{
-            (1.0/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
+            (BASE_PIECE_FALL_SPEED/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
         };
 
         if step_delay > PLACE_PIECE_DELAY_MAX {
@@ -447,7 +449,7 @@ impl GameLoop for GameLoopImpl{
                 game_events.push(i);
             }
         }
-        self.redraw(c);
+        self.redraw(delta);
         self.handle_game_events(game_events);
     }
 }
