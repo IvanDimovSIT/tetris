@@ -8,6 +8,7 @@ use comfy::*;
 use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::model::Game;
 use crate::constants::*;
@@ -18,6 +19,27 @@ use comfy::vec2;
 
 use comfy::GameLoop;
 
+struct GameStats{
+    time_started: SystemTime,
+    duration: Duration,
+    line_clears_1: i32,
+    line_clears_2: i32,
+    line_clears_3: i32,
+    line_clears_4: i32,
+}
+impl GameStats{
+    fn new() -> GameStats{
+        GameStats{
+            time_started: SystemTime::now(),
+            duration: Duration::ZERO,
+            line_clears_1: 0,
+            line_clears_2: 0,
+            line_clears_3: 0,
+            line_clears_4: 0
+        }
+    }
+}
+
 struct GameLoopImpl{
     game_state: Game,
     time_passed: f32,
@@ -25,6 +47,7 @@ struct GameLoopImpl{
     is_game_over: bool,
     score: i32,
     effects: Vec<ClearEffect>,
+    game_stats: GameStats
 }
 impl GameLoopImpl {
     fn draw_game_board_bg(&self) {
@@ -166,6 +189,14 @@ impl GameLoopImpl {
         if lines.is_empty() {
             return;
         }
+        match lines.len() {
+            1 => self.game_stats.line_clears_1 += 1,
+            2 => self.game_stats.line_clears_2 += 1,
+            3 => self.game_stats.line_clears_3 += 1,
+            4 => self.game_stats.line_clears_4 += 1,
+            _ => {},
+        }
+
         play_sound(CLEAR_SOUND_TAG);
 
         println!("cleared lines:{}", lines.len());
@@ -269,8 +300,8 @@ impl GameLoopImpl {
     fn draw_game_over(&self) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         draw_text_ex(
-            format!("Game Over! Score:{}", self.score).as_str(),
-            splat(0.0),
+            GAME_OVER_TEXT,
+            vec2(GAME_OVER_POSITION.0,GAME_OVER_POSITION.1),
             TextAlign::Center,
             TextParams{
                 font: FontId { 
@@ -281,6 +312,33 @@ impl GameLoopImpl {
                 color: WHITE 
             }
         );
+
+        egui::Window::new("Results")
+        .anchor(egui::Align2::CENTER_BOTTOM, egui::vec2(0.0, -100.0))
+        .default_width(RESULTS_SIZE.0)
+        .default_height(RESULTS_SIZE.1)
+        .fixed_size(egui::vec2(RESULTS_SIZE.0, RESULTS_SIZE.1))
+        .show(egui(), |ui| {
+            ui.label(egui::RichText::new(format!("Score: {}", self.score)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+
+            ui.label(egui::RichText::new(format!("Time: {:?}:{:?}",
+                self.game_stats.duration.as_secs()/60,
+                self.game_stats.duration.as_secs()%60)).font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
+
+            ui.label(egui::RichText::new(format!("Single line clears: {}", self.game_stats.line_clears_1)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+
+            ui.label(egui::RichText::new(format!("Double line clears: {}", self.game_stats.line_clears_2)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+
+            ui.label(egui::RichText::new(format!("Tripple line clears: {}", self.game_stats.line_clears_3)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+
+            ui.label(egui::RichText::new(format!("Quadruple line clears: {}", self.game_stats.line_clears_4)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+
+            ui.label(egui::RichText::new(format!("Total lines cleared: {}",
+                self.game_stats.line_clears_4*4 + self.game_stats.line_clears_3*3 + self.game_stats.line_clears_2*2 + self.game_stats.line_clears_1))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
+        });
     }
 
     fn draw_effects(&mut self, delta: f32) {
@@ -302,6 +360,7 @@ impl GameLoopImpl {
                     println!("Game over! score:{score}");
                     play_sound(GAMEOVER_SOUND_TAG);
                     self.is_game_over = true;
+                    self.game_stats.duration = SystemTime::now().duration_since(self.game_stats.time_started).unwrap();
                 },
                 GameEvent::PieceSet => {
                     println!("Piece set");
@@ -326,6 +385,7 @@ impl GameLoop for GameLoopImpl{
             is_game_over: false,
             score: 0,
             effects: vec![],
+            game_stats: GameStats::new()
         };     
         
         game_loop
@@ -413,9 +473,9 @@ pub async fn run() {
 
     let mut engine = EngineState::new();
 
-    let game = GameLoopImpl::new(&mut engine);
     load_sounds();
-
+    let mut game = GameLoopImpl::new(&mut engine);
+    game.game_stats.time_started = SystemTime::now();
     run_comfy_main_async(game, engine).await;
 }
 

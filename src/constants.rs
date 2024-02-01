@@ -68,7 +68,12 @@ pub const HELD_PIECE_SQUARE_SIZE: f32 = 1.2;
 pub const HELD_PIECE_EMPTY_TEXT: &str = "HOLD(E)";
 pub const HELD_PIECE_EMPTY_TEXT_SIZE: f32 = 32.0;
 
+pub const GAME_OVER_POSITION: (f32, f32) = (0.0, 2.0);
+pub const GAME_OVER_TEXT: &str = "Game Over!";
 pub const GAME_OVER_TEXT_SIZE: f32 = 48.0;
+pub const RESULTS_TEXT_SIZE: f32 = 22.0;
+pub const RESULTS_SIZE: (f32, f32) = (500.0, 300.0);
+
 
 pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 3.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = 1.5; 
