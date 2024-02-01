@@ -90,3 +90,4 @@ pub const CANTSWAP_SOUND_TAG: &str = "CantSwap";
 pub const SWAP_SOUND_TAG: &str = "Swap";
 pub const ROTATE_SOUND_TAG: &str = "Rotate";
 pub const MOVE_SOUND_TAG: &str = "Move";
+pub const MUSIC_SOUND_TAG: &str = "Music";

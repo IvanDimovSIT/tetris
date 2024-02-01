@@ -101,4 +101,13 @@ pub fn load_sounds() {
         )),
         StaticSoundSettings::default(),
     );
+
+    load_sound_from_bytes(
+        MUSIC_SOUND_TAG,
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/music.wav"
+        )),
+        StaticSoundSettings::new().loop_region(..),
+    );
 }

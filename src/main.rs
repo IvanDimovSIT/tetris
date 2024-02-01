@@ -393,10 +393,10 @@ impl GameLoop for GameLoopImpl{
 
     fn update(&mut self, c: &mut EngineContext) {
         if self.is_game_over {
+            stop_sound(MUSIC_SOUND_TAG);
             self.draw_game_over();
             return;
         }
-
         self.time_passed += c.delta;
 
         let mut game_events: Vec<GameEvent> = vec![];
@@ -476,6 +476,7 @@ pub async fn run() {
     load_sounds();
     let mut game = GameLoopImpl::new(&mut engine);
     game.game_stats.time_started = SystemTime::now();
+    play_sound(MUSIC_SOUND_TAG);
     run_comfy_main_async(game, engine).await;
 }
 
