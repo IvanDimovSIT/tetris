@@ -126,6 +126,16 @@ impl GameLoopImpl {
 
         let held = self.game_state.get_held();
         if held.is_none() {
+            draw_text_ex(
+                HELD_PIECE_EMPTY_TEXT,
+                vec2(HELD_PIECE_POSITION.0, HELD_PIECE_POSITION.1),
+                TextAlign::Center,
+                TextParams { 
+                    font:FontId{family: epaint::FontFamily::Proportional, size: HELD_PIECE_EMPTY_TEXT_SIZE},
+                    rotation: 0.0,
+                    color: WHITE 
+                }
+            );
             return;
         }
 
