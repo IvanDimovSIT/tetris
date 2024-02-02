@@ -426,6 +426,23 @@ impl Game {
         result
     }
 
+    pub fn move_up(&mut self) -> bool {
+        let result = self.board.move_active_up();
+        self.board.position_ghost_pieces();
+
+        result
+    }
+
+    pub fn move_down(&mut self) -> bool {
+        if !self.can_move_down() {
+            return false;
+        } 
+        self.board.move_active_down();
+        self.board.position_ghost_pieces();
+
+        true
+    }
+
     pub fn rotate_left(&mut self) -> bool {
         let result = self.board.rotate_active_left();
         if result {

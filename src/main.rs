@@ -243,6 +243,15 @@ impl GameLoopImpl {
                 assert!(self.game_state.move_left());
             }
         }
+
+        if self.game_state.move_up() {
+            if self.game_state.rotate_left() {
+                play_sound(ROTATE_SOUND_TAG);
+                return;
+            }else{
+                assert!(self.game_state.move_down());
+            }
+        }
     }
 
     fn handle_rotate_right(&mut self){
@@ -266,6 +275,15 @@ impl GameLoopImpl {
                 return;
             }else{
                 assert!(self.game_state.move_left());
+            }
+        }
+
+        if self.game_state.move_up() {
+            if self.game_state.rotate_right() {
+                play_sound(ROTATE_SOUND_TAG);
+                return;
+            }else{
+                assert!(self.game_state.move_down());
             }
         }
     }
