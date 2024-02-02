@@ -67,7 +67,7 @@ impl Board {
             return Err("Invalid width or height".to_string());
         }
 
-        let mut board = Board{width: width, height: height, squares: vec![], active_piece: starting_piece};
+        let mut board = Board{width, height, squares: vec![], active_piece: starting_piece};
         for _ in 0..(width*height) {
             board.squares.push(Square::None);
         }

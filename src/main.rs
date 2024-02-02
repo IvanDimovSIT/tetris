@@ -8,7 +8,6 @@ use comfy::*;
 use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
-use std::time::SystemTime;
 
 use crate::model::Game;
 use crate::constants::*;
@@ -20,8 +19,7 @@ use comfy::vec2;
 use comfy::GameLoop;
 
 struct GameStats{
-    time_started: SystemTime,
-    duration: Duration,
+    time: f32,
     line_clears_1: i32,
     line_clears_2: i32,
     line_clears_3: i32,
@@ -30,8 +28,7 @@ struct GameStats{
 impl GameStats{
     fn new() -> GameStats{
         GameStats{
-            time_started: SystemTime::now(),
-            duration: Duration::ZERO,
+            time: 0.0,
             line_clears_1: 0,
             line_clears_2: 0,
             line_clears_3: 0,
@@ -47,7 +44,8 @@ struct GameLoopImpl{
     is_game_over: bool,
     score: i32,
     effects: Vec<ClearEffect>,
-    game_stats: GameStats
+    game_stats: GameStats,
+    is_paused: bool
 }
 impl GameLoopImpl {
 
@@ -316,6 +314,23 @@ impl GameLoopImpl {
         self.handle_game_events(events);
     }
 
+    fn draw_pause_screen(&self) {
+        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        draw_text_ex(
+            PAUSE_TEXT,
+            vec2(PAUSE_TEXT_POSITION.0,PAUSE_TEXT_POSITION.1),
+            TextAlign::Center,
+            TextParams{
+                font: FontId { 
+                    size: PAUSE_TEXT_SIZE,
+                    family: epaint::FontFamily::Proportional,
+                },
+                rotation: 0.0,
+                color: WHITE 
+            }
+        );
+    }
+
     fn draw_game_over(&self) {
         clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
         draw_text_ex(
@@ -337,12 +352,13 @@ impl GameLoopImpl {
         .default_width(RESULTS_SIZE.0)
         .default_height(RESULTS_SIZE.1)
         .fixed_size(egui::vec2(RESULTS_SIZE.0, RESULTS_SIZE.1))
+        .collapsible(false)
         .show(egui(), |ui| {
             ui.label(egui::RichText::new(format!("Score: {}", self.score)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
 
-            ui.label(egui::RichText::new(format!("Time: {:?}:{:?}",
-                self.game_stats.duration.as_secs()/60,
-                self.game_stats.duration.as_secs()%60)).font(FontId::proportional(RESULTS_TEXT_SIZE))
+            ui.label(egui::RichText::new(format!("Time: {:?}:{:0>2}",
+                self.game_stats.time as i32 /60,
+                self.game_stats.time as i32 %60)).font(FontId::proportional(RESULTS_TEXT_SIZE))
             );
 
             ui.label(egui::RichText::new(format!("Single line clears: {}", self.game_stats.line_clears_1)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
@@ -379,14 +395,12 @@ impl GameLoopImpl {
                     println!("Game over! score:{score}");
                     play_sound(GAMEOVER_SOUND_TAG);
                     self.is_game_over = true;
-                    self.game_stats.duration = SystemTime::now().duration_since(self.game_stats.time_started).unwrap();
                 },
                 GameEvent::PieceSet => {
                     println!("Piece set");
                     play_sound(PLACE_SOUND_TAG);
                 },
                 GameEvent::LinesCleared(lines) => {self.on_lines_cleared(lines)},
-                _ => {},
             }
         }
     }
@@ -404,7 +418,8 @@ impl GameLoop for GameLoopImpl{
             is_game_over: false,
             score: 0,
             effects: vec![],
-            game_stats: GameStats::new()
+            game_stats: GameStats::new(),
+            is_paused: false
         };     
         
         game_loop
@@ -416,11 +431,27 @@ impl GameLoop for GameLoopImpl{
             self.draw_game_over();
             return;
         }
-        let delta = c.delta;        
+
+        if is_key_pressed(KeyCode::Escape){
+            if self.is_paused {
+                play_sound(MUSIC_SOUND_TAG);    
+            }
+            self.is_paused = ! self.is_paused;
+        }
+        
+        if self.is_paused {
+            stop_sound(MUSIC_SOUND_TAG);
+            self.draw_pause_screen();
+            return;
+        }
+
+        let delta = c.delta;
+        self.game_stats.time += delta;        
         self.time_passed += delta;
 
         let mut game_events: Vec<GameEvent> = vec![];
         
+
         if is_key_pressed(KeyCode::Space) {
             self.handle_set_piece();
         }
@@ -495,8 +526,7 @@ pub async fn run() {
     let mut engine = EngineState::new();
 
     load_sounds();
-    let mut game = GameLoopImpl::new(&mut engine);
-    game.game_stats.time_started = SystemTime::now();
+    let game = GameLoopImpl::new(&mut engine);
     play_sound(MUSIC_SOUND_TAG);
     run_comfy_main_async(game, engine).await;
 }
