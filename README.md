@@ -16,4 +16,6 @@ Z - Rotate left
 
 Space - Place
 
+E - Swap
+
 Esc - Pause/Unpause
