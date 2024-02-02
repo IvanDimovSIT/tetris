@@ -8,11 +8,13 @@ use comfy::*;
 use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
+use view::Effect;
 
 use crate::model::Game;
 use crate::constants::*;
 use crate::model::GameEvent;
 use crate::view::ClearEffect;
+use crate::view::PlaceEffect;
 
 use comfy::vec2;
 
@@ -43,7 +45,7 @@ struct GameLoopImpl{
     difficulty: f32,
     is_game_over: bool,
     score: i32,
-    effects: Vec<ClearEffect>,
+    effects: Vec<Box<dyn Effect>>,
     game_stats: GameStats,
     is_paused: bool
 }
@@ -204,14 +206,16 @@ impl GameLoopImpl {
 
         for i in lines {
             let center = vec2(
-                GAME_BOARD_TOP_LEFT_POSITION.0 + WIDTH as f32 * SQUARE_SIZE as f32 / 2.0 - SQUARE_SIZE/2.0,
+                GAME_BOARD_TOP_LEFT_POSITION.0 + WIDTH as f32 * SQUARE_SIZE / 2.0 - SQUARE_SIZE/2.0,
                 GAME_BOARD_TOP_LEFT_POSITION.1 - i as f32 * SQUARE_SIZE);
 
             self.effects.push(
-                ClearEffect::new(
-                    center,
-                    vec2(SQUARE_SIZE*WIDTH as f32, SQUARE_SIZE),
-                    CLEAR_EFFECT_DELAY
+                Box::new(
+                    ClearEffect::new(
+                        center,
+                        vec2(SQUARE_SIZE*WIDTH as f32, SQUARE_SIZE),
+                        CLEAR_EFFECT_DELAY
+                    )
                 )
             );
         }
@@ -381,11 +385,7 @@ impl GameLoopImpl {
             i.draw(delta);
         }
 
-        self.effects = self.effects
-            .iter()
-            .filter(|x| {!x.is_complete()})
-            .map(|x| {*x})
-            .collect();
+        self.effects.retain(|x| !x.is_complete());
     }
 
     fn handle_game_events(&mut self, events: Vec<GameEvent>){
@@ -396,8 +396,9 @@ impl GameLoopImpl {
                     play_sound(GAMEOVER_SOUND_TAG);
                     self.is_game_over = true;
                 },
-                GameEvent::PieceSet => {
+                GameEvent::PieceSet((squares, _color)) => {
                     println!("Piece set");
+                    self.effects.push(Box::new(PlaceEffect::new(squares)));
                     play_sound(PLACE_SOUND_TAG);
                 },
                 GameEvent::LinesCleared(lines) => {self.on_lines_cleared(lines)},
@@ -411,8 +412,8 @@ impl GameLoop for GameLoopImpl{
         let game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
         
-        let game_loop = GameLoopImpl{
-            game_state: game_state,
+        GameLoopImpl{
+            game_state,
             time_passed: 1.0,
             difficulty: START_DIFFICULTY,
             is_game_over: false,
@@ -420,9 +421,7 @@ impl GameLoop for GameLoopImpl{
             effects: vec![],
             game_stats: GameStats::new(),
             is_paused: false
-        };     
-        
-        game_loop
+        }  
     }
 
     fn update(&mut self, c: &mut EngineContext) {

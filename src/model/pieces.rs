@@ -42,7 +42,7 @@ impl Piece for SquarePiece {
 }
 impl SquarePiece {
     pub fn new(position: (i32, i32)) -> SquarePiece {
-        let mut square_piece = SquarePiece{position: position, squares: vec![]};
+        let mut square_piece = SquarePiece{position, squares: vec![]};
         square_piece.squares.push((0,0));
         square_piece.squares.push((1,0));
         square_piece.squares.push((0,1));

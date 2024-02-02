@@ -303,7 +303,7 @@ impl Board {
 pub enum GameEvent {
     LinesCleared(Vec<usize>),
     GameOver(i32),
-    PieceSet,
+    PieceSet((Vec<(i32, i32)>, Color))
 }
 
 pub struct Game {
@@ -349,8 +349,8 @@ impl Game {
 
         if !self.board.move_active_down() {
             self.has_swaped = false;
+            events.push(GameEvent::PieceSet(self.board.get_active_piece_squares()));
             self.board.set_active_piece(self.next.pop_back().unwrap());
-            events.push(GameEvent::PieceSet);
             self.next.push_front(self.piece_generator.generate_piece());
             let cleared_lines = self.board.clear_lines();
             self.update_score(&cleared_lines);                     
@@ -364,7 +364,8 @@ impl Game {
         }
 
         self.board.position_ghost_pieces();        
-        return events;
+        
+        events 
     }
 
     pub fn get_held(&self) -> Option<(Vec<(i32, i32)>, Color)> {
@@ -470,7 +471,7 @@ impl Game {
 
         let active = self.board.get_active_piece_squares();
         for i in active.0 {
-            squares[(i.0 + i.1*self.board.width as i32) as usize] = Square::Normal(active.1.clone()); 
+            squares[(i.0 + i.1*self.board.width as i32) as usize] = Square::Normal(active.1); 
         }
 
         squares

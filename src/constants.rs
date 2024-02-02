@@ -78,14 +78,16 @@ pub const PAUSE_TEXT: &str = "Paused (esc)";
 pub const PAUSE_TEXT_SIZE: f32 = 38.0;
 pub const PAUSE_TEXT_POSITION: (f32, f32) = (0.0, 2.0);
 
-pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 4.0;
+pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 5.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED; 
 
 pub const LIGHT_EFFECT: f32 = 0.25;
 
-pub const CLEAR_EFFECT_Z: i32 = 2;
+pub const EFFECT_Z: i32 = 2;
 pub const CLEAR_EFFECT_DELAY: f32 = 0.15;
+pub const PLACE_EFFECT_DELAY: f32 = 0.05;
+pub const PLACE_EFFECT_SIZE: f32 = 0.6;
 
 pub const PLACE_SOUND_TAG: &str = "Place";
 pub const CLEAR_SOUND_TAG: &str = "Clear";
