@@ -323,7 +323,9 @@ impl Game {
         if board.is_err() {
             Err("Error constructing game".to_string())
         } else {
-            Ok(Game {board: board.unwrap(), score: 0, next: pieces, held: None, has_swaped: false, piece_generator})
+            let mut game = Game {board: board.unwrap(), score: 0, next: pieces, held: None, has_swaped: false, piece_generator};
+            game.board.position_ghost_pieces();
+            Ok(game)
         }
     }
 
@@ -396,7 +398,8 @@ impl Game {
 
     pub fn can_move_down(&mut self) -> bool {
         if self.board.move_active_down() {
-            debug_assert!(self.board.move_active_up());
+            let result = self.board.move_active_up();
+            debug_assert!(result);
             true
         }else{
             false

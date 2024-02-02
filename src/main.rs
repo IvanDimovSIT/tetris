@@ -398,7 +398,7 @@ impl GameLoop for GameLoopImpl{
             self.draw_game_over();
             return;
         }
-        let delta = c.delta;
+        let delta = c.delta;        
         self.time_passed += delta;
 
         let mut game_events: Vec<GameEvent> = vec![];
@@ -431,17 +431,18 @@ impl GameLoop for GameLoopImpl{
             let received = self.game_state.next_step();
             self.handle_game_events(received);
         }
-
+    
         let mut step_delay = if self.game_state.can_move_down() {
             BASE_PIECE_FALL_SPEED/self.difficulty
         }else{
             (BASE_PIECE_FALL_SPEED/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
         };
+           
 
         if step_delay > PLACE_PIECE_DELAY_MAX {
             step_delay = PLACE_PIECE_DELAY_MAX;
         }
-
+        
         if self.time_passed >= step_delay {
             self.time_passed = 0.0;
             let received = self.game_state.next_step();

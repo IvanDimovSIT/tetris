@@ -138,30 +138,30 @@ impl Piece for LPiece {
 }
 impl LPiece {
     pub fn new(position: (i32, i32)) -> LPiece {
-        let mut l_piece = LPiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut l_piece = LPiece{position: (position.0, position.1+2), squares: vec![], rotation: Rotation::Up};
         l_piece.squares.push(vec![]);
         l_piece.squares[0].push((0,0));
-        l_piece.squares[0].push((1,0));
-        l_piece.squares[0].push((1,1));
-        l_piece.squares[0].push((1,2));
+        l_piece.squares[0].push((0,-1));
+        l_piece.squares[0].push((0,-2));
+        l_piece.squares[0].push((-1,-2));
 
         l_piece.squares.push(vec![]);
+        l_piece.squares[1].push((0,0));
+        l_piece.squares[1].push((-1,0));
         l_piece.squares[1].push((1,0));
-        l_piece.squares[1].push((1,1));
-        l_piece.squares[1].push((0,1));
-        l_piece.squares[1].push((-1,1));
+        l_piece.squares[1].push((1,-1));
 
         l_piece.squares.push(vec![]);
         l_piece.squares[2].push((0,0));
-        l_piece.squares[2].push((0,1));
-        l_piece.squares[2].push((0,2));
-        l_piece.squares[2].push((1,2));
+        l_piece.squares[2].push((1,0));
+        l_piece.squares[2].push((0,-1));
+        l_piece.squares[2].push((0,-2));
 
         l_piece.squares.push(vec![]);
-        l_piece.squares[3].push((0,0));
-        l_piece.squares[3].push((1,0));
         l_piece.squares[3].push((-1,0));
-        l_piece.squares[3].push((-1,1));
+        l_piece.squares[3].push((-1,-1));
+        l_piece.squares[3].push((0,-1));
+        l_piece.squares[3].push((1,-1));
 
         l_piece
     }
@@ -221,18 +221,18 @@ impl Piece for SPiece {
 }
 impl SPiece {
     pub fn new(position: (i32, i32)) -> SPiece {
-        let mut s_piece = SPiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut s_piece = SPiece{position: (position.0, position.1+2), squares: vec![], rotation: Rotation::Up};
         s_piece.squares.push(vec![]);
         s_piece.squares[0].push((0,0));
-        s_piece.squares[0].push((1,0));
-        s_piece.squares[0].push((0,1));
-        s_piece.squares[0].push((-1,1));
+        s_piece.squares[0].push((-1,0));
+        s_piece.squares[0].push((0,-1));
+        s_piece.squares[0].push((1,-1));
 
         s_piece.squares.push(vec![]);
         s_piece.squares[1].push((0,0));
-        s_piece.squares[1].push((0,1));
-        s_piece.squares[1].push((1,1));
-        s_piece.squares[1].push((1,2));
+        s_piece.squares[1].push((0,-1));
+        s_piece.squares[1].push((-1,-1));
+        s_piece.squares[1].push((-1,-2));
 
         s_piece
     }
@@ -299,30 +299,30 @@ impl Piece for JPiece {
 }
 impl JPiece {
     pub fn new(position: (i32, i32)) -> JPiece {
-        let mut j_piece = JPiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut j_piece = JPiece{position: (position.0, position.1+2), squares: vec![], rotation: Rotation::Up};
         j_piece.squares.push(vec![]);
         j_piece.squares[0].push((0,0));
-        j_piece.squares[0].push((1,0));
-        j_piece.squares[0].push((0,1));
-        j_piece.squares[0].push((0,2));
+        j_piece.squares[0].push((0,-1));
+        j_piece.squares[0].push((0,-2));
+        j_piece.squares[0].push((1,-2));
 
         j_piece.squares.push(vec![]);
-        j_piece.squares[1].push((0,0));
         j_piece.squares[1].push((1,0));
-        j_piece.squares[1].push((-1,0));
-        j_piece.squares[1].push((1,1));
+        j_piece.squares[1].push((1,-1));
+        j_piece.squares[1].push((0,-1));
+        j_piece.squares[1].push((-1,-1));
 
         j_piece.squares.push(vec![]);
         j_piece.squares[2].push((0,0));
-        j_piece.squares[2].push((0,1));
-        j_piece.squares[2].push((0,2));
-        j_piece.squares[2].push((-1,2));
+        j_piece.squares[2].push((-1,0));
+        j_piece.squares[2].push((0,-1));
+        j_piece.squares[2].push((0,-2));
 
         j_piece.squares.push(vec![]);
+        j_piece.squares[3].push((0,0));
+        j_piece.squares[3].push((1,0));
         j_piece.squares[3].push((-1,0));
-        j_piece.squares[3].push((-1,1));
-        j_piece.squares[3].push((0,1));
-        j_piece.squares[3].push((1,1));
+        j_piece.squares[3].push((-1,-1));
 
         j_piece
     }
@@ -381,18 +381,18 @@ impl Piece for ZPiece {
 }
 impl ZPiece {
     pub fn new(position: (i32, i32)) -> ZPiece {
-        let mut z_piece = ZPiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut z_piece = ZPiece{position: (position.0, position.1+2), squares: vec![], rotation: Rotation::Up};
         z_piece.squares.push(vec![]);
         z_piece.squares[0].push((0,0));
-        z_piece.squares[0].push((-1,0));
-        z_piece.squares[0].push((0,1));
-        z_piece.squares[0].push((1,1));
+        z_piece.squares[0].push((1,0));
+        z_piece.squares[0].push((0,-1));
+        z_piece.squares[0].push((-1,-1));
 
         z_piece.squares.push(vec![]);
         z_piece.squares[1].push((0,0));
-        z_piece.squares[1].push((0,1));
-        z_piece.squares[1].push((-1,1));
-        z_piece.squares[1].push((-1,2));
+        z_piece.squares[1].push((0,-1));
+        z_piece.squares[1].push((1,-1));
+        z_piece.squares[1].push((1,-2));
 
         z_piece
     }
@@ -451,12 +451,12 @@ impl Piece for LinePiece {
 }
 impl LinePiece {
     pub fn new(position: (i32, i32)) -> LinePiece {
-        let mut line_piece = LinePiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut line_piece = LinePiece{position: (position.0, position.1+3), squares: vec![], rotation: Rotation::Up};
         line_piece.squares.push(vec![]);
         line_piece.squares[0].push((0,0));
-        line_piece.squares[0].push((0,1));
-        line_piece.squares[0].push((0,2));
-        line_piece.squares[0].push((0,3));
+        line_piece.squares[0].push((0,-1));
+        line_piece.squares[0].push((0,-2));
+        line_piece.squares[0].push((0,-3));
 
         line_piece.squares.push(vec![]);
         line_piece.squares[1].push((0,0));
@@ -527,30 +527,30 @@ impl Piece for TPiece {
 }
 impl TPiece {
     pub fn new(position: (i32, i32)) -> TPiece {
-        let mut t_piece = TPiece{position: position, squares: vec![], rotation: Rotation::Up};
+        let mut t_piece = TPiece{position: (position.0, position.1+2), squares: vec![], rotation: Rotation::Up};
         t_piece.squares.push(vec![]);
         t_piece.squares[0].push((0,0));
-        t_piece.squares[0].push((0,1));
-        t_piece.squares[0].push((-1,1));
-        t_piece.squares[0].push((1,1));
+        t_piece.squares[0].push((1,0));
+        t_piece.squares[0].push((-1,0));
+        t_piece.squares[0].push((0,-1));
 
         t_piece.squares.push(vec![]);
         t_piece.squares[1].push((0,0));
-        t_piece.squares[1].push((0,1));
-        t_piece.squares[1].push((1,1));
-        t_piece.squares[1].push((0,2));
+        t_piece.squares[1].push((0,-1));
+        t_piece.squares[1].push((1,-1));
+        t_piece.squares[1].push((0,-2));
 
         t_piece.squares.push(vec![]);
         t_piece.squares[2].push((0,0));
-        t_piece.squares[2].push((1,0));
-        t_piece.squares[2].push((-1,0));
-        t_piece.squares[2].push((0,1));
+        t_piece.squares[2].push((0,-1));
+        t_piece.squares[2].push((1,-1));
+        t_piece.squares[2].push((-1,-1));
 
         t_piece.squares.push(vec![]);
         t_piece.squares[3].push((0,0));
-        t_piece.squares[3].push((0,1));
-        t_piece.squares[3].push((-1,1));
-        t_piece.squares[3].push((0,2));
+        t_piece.squares[3].push((0,-1));
+        t_piece.squares[3].push((-1,-1));
+        t_piece.squares[3].push((0,-2));
 
         t_piece
     }
