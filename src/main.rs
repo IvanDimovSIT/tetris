@@ -170,7 +170,10 @@ impl GameLoopImpl {
             2 => self.game_stats.line_clears_2 += 1,
             3 => self.game_stats.line_clears_3 += 1,
             4 => self.game_stats.line_clears_4 += 1,
-            _ => {},
+            _ => {
+                dbg!(&lines);
+                panic!("Invalid lines cleared {}", lines.len())
+            },
         }
 
         play_sound(CLEAR_SOUND_TAG);

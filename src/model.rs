@@ -1,4 +1,6 @@
 use std::collections::VecDeque;
+use comfy::image::Luma;
+
 use crate::constants::*;
 
 use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece, TPiece}};
@@ -263,34 +265,35 @@ impl Board {
         lines_to_clear
     }
 
-    fn clear_line(&mut self, row: usize) {
-        for x in 0..self.width {
-            self.set_square((x, row), Square::None);
+    fn clear_lines(&mut self) -> Vec<usize> {
+        let mut lines_to_clear = self.find_lines_to_clear();
+        if lines_to_clear.is_empty() {
+            return lines_to_clear;
         }
 
-        for y in (1..=row).rev() {
-            for x in 0..self.width {
-                let square_to_add = self.get_square((x, y-1));
-                debug_assert!(square_to_add.is_some());
-                self.set_square((x, y), square_to_add.unwrap().clone());
+        for y in lines_to_clear.iter() {
+            for x in 0..self.width{
+                self.set_square((x, *y), Square::None);
             }
         }
 
-        for x in 0..self.width {
-            self.set_square((x, 0), Square::None);
-        }
-    }
+        lines_to_clear.sort();
+        let start = *lines_to_clear.last().unwrap();
+        let end = lines_to_clear.len();
 
-    fn clear_lines(&mut self) -> Vec<usize> {
-        let lines_to_clear = self.find_lines_to_clear();
-        if lines_to_clear.is_empty() {
-            return  lines_to_clear;
+        for y in (end..=start).rev() {
+            for x in 0..self.width {
+                self.set_square((x, y), self.get_square((x, y-end)).unwrap().clone())
+            }
         }
 
-        let row = lines_to_clear.last().unwrap();
-        for _ in &lines_to_clear {
-            self.clear_line(*row);
+        for y in 0..end {
+            for x in 0..self.width {
+                self.set_square((x,y), Square::None);
+            }
         }
+
+        debug_assert!(self.find_lines_to_clear().len() == 0);
 
         lines_to_clear
     }
