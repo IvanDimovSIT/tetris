@@ -3,14 +3,14 @@ A tetris game written in rust using the comfy game engine: https://github.com/da
 
 ![Screenshot](https://github.com/IvanDimovSIT/tetris/blob/master/screenshot.png)
 
-# Controls:
+# Controls
 A/Left - Move left
 
 D/Right - Move right
 
 S/Down - Move down
 
-W/Up - Rotate right
+W/X/Up - Rotate right
 
 Z - Rotate left
 
