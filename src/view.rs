@@ -1,18 +1,39 @@
-use comfy::{draw_rect, load_sound_from_bytes, splat, vec2, Color, StaticSoundSettings, Vec2};
+use comfy::{
+    draw_rect,
+    load_sound_from_bytes,
+    random_box,
+    random_usize,
+    spawn_particle,
+    splat,
+    texture_id,
+    vec2,
+    BlendMode,
+    Color,
+    FadeType,
+    Particle,
+    StaticSoundSettings,
+    Trail,
+    TrailRef,
+    Vec2,
+    BLACK,
+    BLUE,
+    GREEN,
+    RED,
+    YELLOW
+};
 
-use crate::constants::*;
+use crate::{constants::*, model::{self, Square}};
 
 pub trait Effect{
     fn draw(&mut self, delta: f32);
     fn is_complete(&self) -> bool;
 }
 
-#[derive(Clone, Copy)]
 pub struct ClearEffect {
     delay: f32,
     time: f32,
     position: Vec2,
-    size: Vec2,
+    size: Vec2
 }
 impl Effect for ClearEffect {
     fn draw(&mut self, delta: f32) {
@@ -32,6 +53,8 @@ impl Effect for ClearEffect {
             },
             EFFECT_Z
         );
+
+        self.draw_particles(delta);
     }
 
     fn is_complete(&self) -> bool {
@@ -41,6 +64,38 @@ impl Effect for ClearEffect {
 impl ClearEffect {
     pub fn new(position: Vec2, size: Vec2, delay: f32) -> ClearEffect {
         ClearEffect{delay, time: delay, position, size}
+    }
+
+    fn draw_particles(&self, delta: f32) {
+        let draw_count: i32 = (self.size.x * self.size.y * CLEAR_PARTICLES_SPAWN * delta) as i32; 
+
+        for _ in 0..draw_count {
+            let color = vec![RED, GREEN, BLUE, YELLOW][random_usize(0, 3)];
+
+            spawn_particle(Particle {
+                position: random_box(self.position, self.size),
+                size: splat(CLEAR_PARTICLE_SIZE),
+                velocity: CLEAR_PARTICLE_VELOCITY_START,
+                velocity_end: CLEAR_PARTICLE_VELOCITY_END,
+                lifetime_max: CLEAR_PARTICLE_LIFE,
+                fade_type: FadeType::Alpha,
+                texture: texture_id(PARTICLE_TEXTURE_TAG),
+                trail: TrailRef::Local(Trail::new(
+                    CLEAR_PARTICLE_SIZE/5.0,
+                    1.0,
+                    CLEAR_PARTICLE_Z,
+                    color,
+                    BLACK,
+                    CLEAR_PARTICLES_MAX_VERTICIES,
+                    0.5,
+                    5.0,
+                    None,
+                    None,
+                    BlendMode::Additive,
+                )),
+                ..Default::default()
+            });
+        }
     }
 }
 
@@ -151,4 +206,31 @@ pub fn load_sounds() {
         )),
         StaticSoundSettings::new().loop_region(..),
     );
+}
+
+pub fn put_square(center: Vec2, square: &Square, square_size: f32) {
+    let mut color: comfy::Color = match square {
+        Square::Normal(s) | Square::Ghost(s) => {
+            match s {
+                model::Color::Red => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
+                model::Color::Green => { comfy::Color { r: SQUARE_GREEN_R, g: SQUARE_GREEN_G, b: SQUARE_GREEN_B, a: 1.0 } },
+                model::Color::Blue => { comfy::Color { r: SQUARE_BLUE_R, g: SQUARE_BLUE_G, b: SQUARE_BLUE_B, a: 1.0 } },
+                model::Color::Yellow => { comfy::Color { r: SQUARE_YELLOW_R, g: SQUARE_YELLOW_G, b: SQUARE_YELLOW_B, a: 1.0 } },
+            }
+        },
+        Square::None => panic!("Unrecognised square"),
+    };
+    
+    if let Square::Ghost(_) = square {
+        color.r *= SQUARE_GHOST_COLOR_COEF;
+        color.g *= SQUARE_GHOST_COLOR_COEF;
+        color.b *= SQUARE_GHOST_COLOR_COEF;
+    }
+    draw_rect(center,  splat(square_size), color, SQUARES_Z);
+
+    color.r *= SQUARE_INNER_COLOR_COEF;
+    color.g *= SQUARE_INNER_COLOR_COEF;
+    color.b *= SQUARE_INNER_COLOR_COEF;
+
+    draw_rect(center,  splat(SQUARE_SIZE_INNER_COEF * square_size), color, SQUARES_Z + 1);
 }

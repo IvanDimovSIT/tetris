@@ -8,6 +8,7 @@ use comfy::*;
 use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
+use view::put_square;
 use view::Effect;
 
 use crate::model::Game;
@@ -47,7 +48,8 @@ struct GameLoopImpl{
     score: i32,
     effects: Vec<Box<dyn Effect>>,
     game_stats: GameStats,
-    is_paused: bool
+    is_paused: bool,
+    are_textures_loaded: bool,
 }
 impl GameLoopImpl {
 
@@ -65,33 +67,6 @@ impl GameLoopImpl {
         draw_rect(center, size, BLACK, BOARD_Z);
     }
 
-    fn put_square(&self, center: Vec2, square: &Square, square_size: f32) {
-        let mut color: comfy::Color = match square {
-            Square::Normal(s) | Square::Ghost(s) => {
-                match s {
-                    model::Color::Red => { comfy::Color { r: SQUARE_RED_R, g: SQUARE_RED_G, b: SQUARE_RED_B, a: 1.0 } },
-                    model::Color::Green => { comfy::Color { r: SQUARE_GREEN_R, g: SQUARE_GREEN_G, b: SQUARE_GREEN_B, a: 1.0 } },
-                    model::Color::Blue => { comfy::Color { r: SQUARE_BLUE_R, g: SQUARE_BLUE_G, b: SQUARE_BLUE_B, a: 1.0 } },
-                    model::Color::Yellow => { comfy::Color { r: SQUARE_YELLOW_R, g: SQUARE_YELLOW_G, b: SQUARE_YELLOW_B, a: 1.0 } },
-                }
-            },
-            Square::None => panic!("Unrecognised square"),
-        };
-        
-        if let Square::Ghost(_) = square {
-            color.r *= SQUARE_GHOST_COLOR_COEF;
-            color.g *= SQUARE_GHOST_COLOR_COEF;
-            color.b *= SQUARE_GHOST_COLOR_COEF;
-        }
-        draw_rect(center,  splat(square_size), color, SQUARES_Z);
-
-        color.r *= SQUARE_INNER_COLOR_COEF;
-        color.g *= SQUARE_INNER_COLOR_COEF;
-        color.b *= SQUARE_INNER_COLOR_COEF;
-
-        draw_rect(center,  splat(SQUARE_SIZE_INNER_COEF * square_size), color, SQUARES_Z + 1);
-    }
-
     fn draw_square(&self, position: (u32, u32), square: &Square) {
         if let Square::None = square {
             return;
@@ -102,7 +77,7 @@ impl GameLoopImpl {
             GAME_BOARD_TOP_LEFT_POSITION.1 - position.1 as f32 * SQUARE_SIZE,
         );
         
-        self.put_square(center, square, SQUARE_SIZE);
+        put_square(center, square, SQUARE_SIZE);
     }
 
     fn draw_score(&self) {
@@ -135,7 +110,7 @@ impl GameLoopImpl {
                     LOOK_AHEAD_START_DRAW.0+sq.0 as f32*LOOK_AHEAD_SQUARE_SIZE,
                     LOOK_AHEAD_START_DRAW.1+sq.1 as f32*(-LOOK_AHEAD_SQUARE_SIZE) - i.0 as f32 * LOOK_AHEAD_NEXT_PIECE_OFFSET
                 );
-                self.put_square(center, &Square::Normal(i.1.get_color()), LOOK_AHEAD_SQUARE_SIZE);
+                put_square(center, &Square::Normal(i.1.get_color()), LOOK_AHEAD_SQUARE_SIZE);
             }
         }
     }
@@ -169,7 +144,7 @@ impl GameLoopImpl {
                 HELD_PIECE_POSITION.0 + i.0 as f32 * HELD_PIECE_SQUARE_SIZE - HELD_PIECE_BG_SIZE/1.2,
                 HELD_PIECE_POSITION.1 - i.1 as f32 * HELD_PIECE_SQUARE_SIZE + HELD_PIECE_BG_SIZE/5.0
             );
-            self.put_square(center, &Square::Normal(color), HELD_PIECE_SQUARE_SIZE);
+            put_square(center, &Square::Normal(color), HELD_PIECE_SQUARE_SIZE);
         }
     }
 
@@ -380,6 +355,37 @@ impl GameLoopImpl {
         });
     }
 
+    fn handle_input(&mut self) {
+        if is_key_pressed(KeyCode::Space) {
+            self.handle_set_piece();
+        }
+
+        if is_key_pressed(KeyCode::Left) || is_key_pressed(KeyCode::A) {
+            self.handle_move_left();
+        } 
+
+        if is_key_pressed(KeyCode::Right) || is_key_pressed(KeyCode::D) {
+            self.handle_move_right();
+        }
+
+        if is_key_pressed(KeyCode::Z) {
+            self.handle_rotate_left();
+        }
+
+        if is_key_pressed(KeyCode::X) || is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
+            self.handle_rotate_right();
+        }
+
+        if is_key_pressed(KeyCode::E) {
+            self.handle_swap_piece();
+        }
+
+        if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
+            let received = self.game_state.next_step();
+            self.handle_game_events(received);
+        }
+    }
+
     fn draw_effects(&mut self, delta: f32) {
         for i in &mut self.effects {
             i.draw(delta);
@@ -411,7 +417,7 @@ impl GameLoop for GameLoopImpl{
     fn new(_c: &mut EngineState) -> Self {
         let game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD)
             .expect("Error starting game");
-        
+
         GameLoopImpl{
             game_state,
             time_passed: 1.0,
@@ -420,11 +426,22 @@ impl GameLoop for GameLoopImpl{
             score: 0,
             effects: vec![],
             game_stats: GameStats::new(),
-            is_paused: false
+            is_paused: false,
+            are_textures_loaded: false,
         }  
     }
 
     fn update(&mut self, c: &mut EngineContext) {
+        if !self.are_textures_loaded {
+            c.load_texture_from_bytes(
+                PARTICLE_TEXTURE_TAG,
+                include_bytes!(concat!(
+                    env!("CARGO_MANIFEST_DIR"),
+                    "/assets/particle.png"
+                )),
+            );
+        }
+
         if self.is_game_over {
             stop_sound(MUSIC_SOUND_TAG);
             self.draw_game_over();
@@ -444,41 +461,10 @@ impl GameLoop for GameLoopImpl{
             return;
         }
 
-        let delta = c.delta;
-        self.game_stats.time += delta;        
-        self.time_passed += delta;
-
-        let mut game_events: Vec<GameEvent> = vec![];
+        self.game_stats.time += c.delta;        
+        self.time_passed += c.delta;
         
-
-        if is_key_pressed(KeyCode::Space) {
-            self.handle_set_piece();
-        }
-
-        if is_key_pressed(KeyCode::Left) || is_key_pressed(KeyCode::A) {
-            self.handle_move_left();
-        } 
-
-        if is_key_pressed(KeyCode::Right) || is_key_pressed(KeyCode::D) {
-            self.handle_move_right();
-        }
-
-        if is_key_pressed(KeyCode::Z) {
-            self.handle_rotate_left();
-        }
-
-        if is_key_pressed(KeyCode::X) || is_key_pressed(KeyCode::W) || is_key_pressed(KeyCode::Up){
-            self.handle_rotate_right();
-        }
-
-        if is_key_pressed(KeyCode::E) {
-            self.handle_swap_piece();
-        }
-
-        if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            let received = self.game_state.next_step();
-            self.handle_game_events(received);
-        }
+        self.handle_input();
     
         let mut step_delay = if self.game_state.can_move_down() {
             BASE_PIECE_FALL_SPEED/self.difficulty
@@ -490,7 +476,8 @@ impl GameLoop for GameLoopImpl{
         if step_delay > PLACE_PIECE_DELAY_MAX {
             step_delay = PLACE_PIECE_DELAY_MAX;
         }
-        
+
+        let mut game_events: Vec<GameEvent> = vec![];        
         if self.time_passed >= step_delay {
             self.time_passed = 0.0;
             let received = self.game_state.next_step();
@@ -498,7 +485,7 @@ impl GameLoop for GameLoopImpl{
                 game_events.push(i);
             }
         }
-        self.redraw(delta);
+        self.redraw(c.delta);
         self.handle_game_events(game_events);
     }
 }
@@ -525,6 +512,7 @@ pub async fn run() {
     let mut engine = EngineState::new();
 
     load_sounds();
+
     let game = GameLoopImpl::new(&mut engine);
     play_sound(MUSIC_SOUND_TAG);
     run_comfy_main_async(game, engine).await;

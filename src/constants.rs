@@ -82,12 +82,21 @@ pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 5.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED; 
 
-pub const LIGHT_EFFECT: f32 = 0.25;
+pub const LIGHT_EFFECT: f32 = 0.3;
 
 pub const EFFECT_Z: i32 = 2;
 pub const CLEAR_EFFECT_DELAY: f32 = 0.15;
 pub const PLACE_EFFECT_DELAY: f32 = 0.05;
-pub const PLACE_EFFECT_SIZE: f32 = 0.6;
+pub const PLACE_EFFECT_SIZE: f32 = 0.7;
+pub const CLEAR_PARTICLE_Z: i32 = 3;
+pub const CLEAR_PARTICLE_LIFE: f32 = 0.3;
+pub const CLEAR_PARTICLE_VELOCITY_START: f32 = 15.0;
+pub const CLEAR_PARTICLE_VELOCITY_END: f32 = 2.0;
+pub const CLEAR_PARTICLE_SIZE: f32 = 0.5;
+pub const CLEAR_PARTICLES_SPAWN: f32 = 20.0;
+pub const CLEAR_PARTICLES_MAX_VERTICIES: usize = 8;
+
+pub const PARTICLE_TEXTURE_TAG: &str = "Particle";
 
 pub const PLACE_SOUND_TAG: &str = "Place";
 pub const CLEAR_SOUND_TAG: &str = "Clear";
