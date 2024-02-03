@@ -291,6 +291,7 @@ impl GameLoopImpl {
 
     fn handle_set_piece(&mut self){
         self.game_state.set_piece_down();
+        self.score = self.game_state.get_score();
         let events = self.game_state.next_step();
         self.time_passed = 0.0;
         self.handle_game_events(events);

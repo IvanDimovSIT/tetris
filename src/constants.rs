@@ -50,10 +50,11 @@ pub const SQUARES_Z: i32 = 1;
 pub const START_DIFFICULTY: f32 = 1.0;
 pub const DIFFICULTY_INCREASE: f32 = 0.18;
 
-pub const SCORE_REWARD_LINES1: i32 = 100;
-pub const SCORE_REWARD_LINES2: i32 = 200;
-pub const SCORE_REWARD_LINES3: i32 = 400;
-pub const SCORE_REWARD_LINES4: i32 = 800;
+pub const SCORE_REWARD_LINES1: i32 = 200;
+pub const SCORE_REWARD_LINES2: i32 = 400;
+pub const SCORE_REWARD_LINES3: i32 = 800;
+pub const SCORE_REWARD_LINES4: i32 = 1600;
+pub const SCORE_REWARD_QUICK_PLACE: i32 = 10;
 
 pub const LOOK_AHEAD_POSITION: (f32, f32) = (6.5, -2.0);
 pub const LOOK_AHEAD_WIDTH: f32 = 7.0;

@@ -411,9 +411,13 @@ impl Game {
     }
 
     pub fn set_piece_down(&mut self) {
+        let mut squares_moved = 0;
         while self.board.move_active_down() {
+            squares_moved += 1;
         }
         self.board.position_ghost_pieces();
+        
+        self.score += squares_moved*SCORE_REWARD_QUICK_PLACE;
     }
 
     pub fn move_left(&mut self) -> bool {
