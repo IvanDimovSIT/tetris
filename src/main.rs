@@ -23,6 +23,7 @@ use comfy::GameLoop;
 
 struct GameStats{
     time: f32,
+    swaps: i32,
     line_clears_1: i32,
     line_clears_2: i32,
     line_clears_3: i32,
@@ -32,6 +33,7 @@ impl GameStats{
     fn new() -> GameStats{
         GameStats{
             time: 0.0,
+            swaps: 0,
             line_clears_1: 0,
             line_clears_2: 0,
             line_clears_3: 0,
@@ -272,6 +274,7 @@ impl GameLoopImpl {
         let result = self.game_state.swap_held();
         if result {
             play_sound(SWAP_SOUND_TAG);
+            self.game_stats.swaps += 1;
         }else{
             play_sound(CANTSWAP_SOUND_TAG);
         }
@@ -337,23 +340,40 @@ impl GameLoopImpl {
         .fixed_size(egui::vec2(RESULTS_SIZE.0, RESULTS_SIZE.1))
         .collapsible(false)
         .show(egui(), |ui| {
-            ui.label(egui::RichText::new(format!("Score: {}", self.score)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+            ui.label(egui::RichText::new(format!("Score: {}", self.score))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
 
             ui.label(egui::RichText::new(format!("Time: {:?}:{:0>2}",
                 self.game_stats.time as i32 /60,
                 self.game_stats.time as i32 %60)).font(FontId::proportional(RESULTS_TEXT_SIZE))
             );
 
-            ui.label(egui::RichText::new(format!("Single line clears: {}", self.game_stats.line_clears_1)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+            ui.label(egui::RichText::new(format!("Swaps: {}", self.game_stats.swaps))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
 
-            ui.label(egui::RichText::new(format!("Double line clears: {}", self.game_stats.line_clears_2)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+            ui.label(egui::RichText::new(format!("Single line clears: {}", self.game_stats.line_clears_1))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
 
-            ui.label(egui::RichText::new(format!("Tripple line clears: {}", self.game_stats.line_clears_3)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+            ui.label(egui::RichText::new(format!("Double line clears: {}", self.game_stats.line_clears_2))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
 
-            ui.label(egui::RichText::new(format!("Quadruple line clears: {}", self.game_stats.line_clears_4)).font(FontId::proportional(RESULTS_TEXT_SIZE)));
+            ui.label(egui::RichText::new(format!("Tripple line clears: {}", self.game_stats.line_clears_3))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
+
+            ui.label(egui::RichText::new(format!("Quadruple line clears: {}", self.game_stats.line_clears_4))
+                .font(FontId::proportional(RESULTS_TEXT_SIZE))
+            );
 
             ui.label(egui::RichText::new(format!("Total lines cleared: {}",
-                self.game_stats.line_clears_4*4 + self.game_stats.line_clears_3*3 + self.game_stats.line_clears_2*2 + self.game_stats.line_clears_1))
+                self.game_stats.line_clears_4*4 +
+                self.game_stats.line_clears_3*3 +
+                self.game_stats.line_clears_2*2 +
+                self.game_stats.line_clears_1))
                 .font(FontId::proportional(RESULTS_TEXT_SIZE))
             );
         });
