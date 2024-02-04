@@ -482,8 +482,8 @@ impl GameLoop for GameLoopImpl{
         }
 
         let mut game_events: Vec<GameEvent> = vec![];        
-        if self.time_passed >= step_delay {
-            self.time_passed = 0.0;
+        while self.time_passed >= step_delay {
+            self.time_passed -= step_delay;
             let received = self.game_state.next_step();
             for i in received {
                 game_events.push(i);

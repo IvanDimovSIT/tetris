@@ -278,20 +278,19 @@ impl Board {
         }
 
         lines_to_clear.sort();
-        let start = *lines_to_clear.last().unwrap();
-        let end = lines_to_clear.len();
 
-        for y in (end..=start).rev() {
-            for x in 0..self.width {
-                self.set_square((x, y), self.get_square((x, y-end)).unwrap().clone())
+        for l in &lines_to_clear {
+            for y in (1..=*l).rev() {
+                for x in 0..self.width {
+                    self.set_square((x, y), self.get_square((x, y-1)).unwrap().clone())
+                }
             }
         }
 
-        for y in 0..end {
-            for x in 0..self.width {
-                self.set_square((x,y), Square::None);
-            }
+        for x in 0..self.width {
+            self.set_square((x,0), Square::None);
         }
+        
 
         debug_assert!(self.find_lines_to_clear().len() == 0);
 

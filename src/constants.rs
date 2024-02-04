@@ -79,7 +79,7 @@ pub const PAUSE_TEXT: &str = "Paused (esc)";
 pub const PAUSE_TEXT_SIZE: f32 = 38.0;
 pub const PAUSE_TEXT_POSITION: (f32, f32) = (0.0, 2.0);
 
-pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 5.0;
+pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 6.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED; 
 
