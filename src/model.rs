@@ -1,5 +1,4 @@
 use std::collections::VecDeque;
-use comfy::image::Luma;
 
 use crate::constants::*;
 
@@ -290,9 +289,8 @@ impl Board {
         for x in 0..self.width {
             self.set_square((x,0), Square::None);
         }
-        
 
-        debug_assert!(self.find_lines_to_clear().len() == 0);
+        debug_assert!(self.find_lines_to_clear().is_empty());
 
         lines_to_clear
     }
@@ -333,17 +331,6 @@ impl Game {
 
     pub fn get_look_ahead(&self) -> Vec<&dyn Piece> {
         self.next.iter().map(|x| -> &dyn Piece {x.as_ref()}).collect()
-    }
-
-
-    fn update_score(&mut self, cleared_lines: &Vec<usize>) {
-        self.score += match cleared_lines.len() {
-            1 => {SCORE_REWARD_LINES1},
-            2 => {SCORE_REWARD_LINES2},
-            3 => {SCORE_REWARD_LINES3},
-            4 => {SCORE_REWARD_LINES4},
-            _ => {0},
-        }
     }
 
     pub fn next_step(&mut self) -> Vec<GameEvent> {
@@ -483,11 +470,13 @@ impl Game {
         squares
     }
 
-    pub fn get_width(&self) -> usize {
-        self.board.width
-    }
-
-    pub fn get_height(&self) -> usize {
-        self.board.height
+    fn update_score(&mut self, cleared_lines: &Vec<usize>) {
+        self.score += match cleared_lines.len() {
+            1 => {SCORE_REWARD_LINES1},
+            2 => {SCORE_REWARD_LINES2},
+            3 => {SCORE_REWARD_LINES3},
+            4 => {SCORE_REWARD_LINES4},
+            _ => {0},
+        }
     }
 }
