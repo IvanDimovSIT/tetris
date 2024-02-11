@@ -9,6 +9,7 @@ use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
 use view::put_square;
+use view::BGColorSelector;
 use view::Effect;
 
 use crate::model::Game;
@@ -49,6 +50,7 @@ struct GameLoopImpl{
     is_game_over: bool,
     score: i32,
     effects: Vec<Box<dyn Effect>>,
+    bg_color: BGColorSelector,
     game_stats: GameStats,
     is_paused: bool,
     are_textures_loaded: bool,
@@ -151,7 +153,7 @@ impl GameLoopImpl {
     }
 
     fn redraw(&mut self, delta: f32) {
-        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        clear_background(self.bg_color.get_color());
         self.draw_game_board_bg();
         let squares = self.game_state.get_board_squares();
         for (ind, s) in squares.iter().enumerate() {
@@ -167,6 +169,7 @@ impl GameLoopImpl {
         if lines.is_empty() {
             return;
         }
+        
         match lines.len() {
             1 => self.game_stats.line_clears_1 += 1,
             2 => self.game_stats.line_clears_2 += 1,
@@ -178,6 +181,7 @@ impl GameLoopImpl {
             },
         }
 
+        self.bg_color.on_cleared();
         play_sound(CLEAR_SOUND_TAG);
 
         println!("cleared lines:{}", lines.len());
@@ -301,7 +305,7 @@ impl GameLoopImpl {
     }
 
     fn draw_pause_screen(&self) {
-        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        clear_background(self.bg_color.get_color());
         draw_text_ex(
             PAUSE_TEXT,
             vec2(PAUSE_TEXT_POSITION.0,PAUSE_TEXT_POSITION.1),
@@ -318,7 +322,7 @@ impl GameLoopImpl {
     }
 
     fn draw_game_over(&self) {
-        clear_background(comfy::Color { r:BG_COLOR_R, g: BG_COLOR_G, b: BG_COLOR_B, a: 1.0 });
+        clear_background(self.bg_color.get_color());
         draw_text_ex(
             GAME_OVER_TEXT,
             vec2(GAME_OVER_POSITION.0,GAME_OVER_POSITION.1),
@@ -450,6 +454,7 @@ impl GameLoop for GameLoopImpl{
             score: 0,
             effects: vec![],
             game_stats: GameStats::new(),
+            bg_color: BGColorSelector::new(CLEARS_TO_CHANGE_BG),
             is_paused: false,
             are_textures_loaded: false,
         }  

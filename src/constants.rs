@@ -20,9 +20,28 @@ pub const SCORE_BG_Z: i32 = 0;
 pub const SCORE_DIGITS: usize = 13;
 pub const SCORE_FONT_SIZE: f32 = 38.0;
 
-pub const BG_COLOR_R: f32 = 0.3;
-pub const BG_COLOR_G: f32 = 0.3;
-pub const BG_COLOR_B: f32 = 0.8;
+
+pub const CLEARS_TO_CHANGE_BG: usize = 12;
+
+pub const BG_COLOR1_R: f32 = 0.3;
+pub const BG_COLOR1_G: f32 = 0.3;
+pub const BG_COLOR1_B: f32 = 0.8;
+
+pub const BG_COLOR2_R: f32 = 0.4;
+pub const BG_COLOR2_G: f32 = 0.4;
+pub const BG_COLOR2_B: f32 = 0.2;
+
+pub const BG_COLOR3_R: f32 = 0.1;
+pub const BG_COLOR3_G: f32 = 0.5;
+pub const BG_COLOR3_B: f32 = 0.7;
+
+pub const BG_COLOR4_R: f32 = 0.6;
+pub const BG_COLOR4_G: f32 = 0.2;
+pub const BG_COLOR4_B: f32 = 0.3;
+
+pub const BG_COLOR5_R: f32 = 0.1;
+pub const BG_COLOR5_G: f32 = 0.5;
+pub const BG_COLOR5_B: f32 = 0.2;
 
 
 pub const SQUARE_RED_R: f32 = 1.0;
@@ -79,9 +98,9 @@ pub const PAUSE_TEXT: &str = "Paused (esc)";
 pub const PAUSE_TEXT_SIZE: f32 = 38.0;
 pub const PAUSE_TEXT_POSITION: (f32, f32) = (0.0, 2.0);
 
-pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 6.0;
+pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 8.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
-pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED; 
+pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED * 1.2; 
 
 pub const LIGHT_EFFECT: f32 = 0.3;
 

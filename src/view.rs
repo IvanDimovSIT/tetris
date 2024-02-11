@@ -234,3 +234,41 @@ pub fn put_square(center: Vec2, square: &Square, square_size: f32) {
 
     draw_rect(center,  splat(SQUARE_SIZE_INNER_COEF * square_size), color, SQUARES_Z + 1);
 }
+
+pub struct BGColorSelector {
+    colors: Vec<comfy::Color>,
+    current: usize,
+    clears: usize,
+    clears_needed: usize,
+}
+impl BGColorSelector{
+    pub fn new(clears_needed: usize) -> BGColorSelector {
+        BGColorSelector{
+            colors: vec![
+                comfy::Color{r:BG_COLOR1_R, g:BG_COLOR1_G, b:BG_COLOR1_B, a:1.0},
+                comfy::Color{r:BG_COLOR2_R, g:BG_COLOR2_G, b:BG_COLOR2_B, a:1.0},
+                comfy::Color{r:BG_COLOR3_R, g:BG_COLOR3_G, b:BG_COLOR3_B, a:1.0},
+                comfy::Color{r:BG_COLOR4_R, g:BG_COLOR4_G, b:BG_COLOR4_B, a:1.0},
+                comfy::Color{r:BG_COLOR5_R, g:BG_COLOR5_G, b:BG_COLOR5_B, a:1.0},
+            ],
+            current: 0,
+            clears: 0,
+            clears_needed
+        }
+    }
+
+    pub fn on_cleared(&mut self) {
+        self.clears += 1;
+        if self.clears >= self.clears_needed {
+            self.clears = 0;
+            self.current += 1;
+            if self.current >= self.colors.len() {
+                self.current = 0;
+            }
+        }
+    }
+
+    pub fn get_color(&self) -> comfy::Color {
+        self.colors[self.current]
+    }
+}
