@@ -185,6 +185,9 @@ impl GameLoopImpl {
 
         println!("cleared lines:{}", lines.len());
         self.difficulty += DIFFICULTY_INCREASE;
+        if self.difficulty > MAX_DIFFICULTY {
+            self.difficulty = MAX_DIFFICULTY;
+        }
         self.score = self.game_state.get_score();
 
         for i in lines {

@@ -68,6 +68,7 @@ pub const SQUARES_Z: i32 = 1;
 
 pub const START_DIFFICULTY: f32 = 1.0;
 pub const DIFFICULTY_INCREASE: f32 = 0.18;
+pub const MAX_DIFFICULTY: f32 = 16.0;
 
 pub const SCORE_REWARD_LINES1: i32 = 200;
 pub const SCORE_REWARD_LINES2: i32 = 400;
@@ -104,7 +105,7 @@ pub const PAUSE_TEXT_POSITION: (f32, f32) = (0.0, 2.0);
 
 pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 8.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
-pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED * 1.2; 
+pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED * 1.2;
 
 pub const LIGHT_EFFECT: f32 = 0.3;
 
