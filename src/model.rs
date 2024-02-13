@@ -225,6 +225,9 @@ impl Board {
 
         for i in active_squares {
             let pos: usize = (i.0 + i.1*self.width as i32) as usize;
+            if pos > self.squares.len() {
+                continue;
+            }
             match self.squares[pos] {
                 Square::None => { self.squares[pos] = Square::Ghost(self.active_piece.get_color())},
                 _ => {panic!("Error positioning ghost pieces")},
@@ -335,6 +338,11 @@ impl Game {
 
     pub fn next_step(&mut self) -> Vec<GameEvent> {
         let mut events: Vec<GameEvent> = vec![];
+
+        if !self.board.is_active_piece_valid() {
+            events.push(GameEvent::GameOver(self.score));
+            return events;
+        }
 
         if !self.board.move_active_down() {
             self.has_swaped = false;
