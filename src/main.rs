@@ -5,7 +5,6 @@ mod view;
 use comfy::epaint::FontId;
 
 use comfy::*;
-use comfy::EngineState;
 use model::Square;
 use view::load_sounds;
 use view::put_square;

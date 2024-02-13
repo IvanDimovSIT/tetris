@@ -1,25 +1,6 @@
-use comfy::{
-    draw_rect,
-    load_sound_from_bytes,
-    random_box,
-    random_usize,
-    spawn_particle,
-    splat,
-    texture_id,
-    vec2,
-    BlendMode,
-    Color,
-    FadeType,
-    Particle,
-    StaticSoundSettings,
-    Trail,
-    TrailRef,
-    Vec2,
-    BLACK,
-    BLUE,
-    GREEN,
-    RED,
-    YELLOW
+use comfy::{ 
+    draw_rect, load_sound_from_bytes, random_box, random_usize, spawn_particle, splat, texture_id, vec2, BlendMode,
+    Color, FadeType, Particle, StaticSoundSettings, Trail, TrailRef, Vec2, BLACK, BLUE, GREEN, RED, YELLOW
 };
 
 use crate::{constants::*, model::{self, Square}};
