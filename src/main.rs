@@ -321,7 +321,27 @@ impl GameLoopImpl {
         );
     }
 
-    fn draw_game_over(&self) {
+    fn restart(&mut self) {
+        self.game_state = Game::new(WIDTH, HEIGHT, LOOK_AHEAD).expect("Error reloading game");
+        self.time_passed = 1.0;
+        self.difficulty = START_DIFFICULTY;
+        self.is_game_over = false;
+        self.score = 0;
+        self.effects = vec![];
+        self.game_stats = GameStats::new();
+        self.bg_color = BGColorSelector::new(CLEARS_TO_CHANGE_BG);
+        self.is_paused = false;
+        self.are_textures_loaded = false;
+
+        play_sound(MUSIC_SOUND_TAG);    
+    }
+
+    fn draw_game_over(&mut self) {
+        if is_key_pressed(KeyCode::R){
+            self.restart();
+            return;
+        }
+
         clear_background(self.bg_color.get_color());
         draw_text_ex(
             GAME_OVER_TEXT,
@@ -330,6 +350,20 @@ impl GameLoopImpl {
             TextParams{
                 font: FontId { 
                     size: GAME_OVER_TEXT_SIZE,
+                    family: epaint::FontFamily::Proportional,
+                },
+                rotation: 0.0,
+                color: WHITE 
+            }
+        );
+
+        draw_text_ex(
+            RESTART_TEXT,
+            vec2(RESTART_TEXT_POSITION.0,RESTART_TEXT_POSITION.1),
+            TextAlign::Center,
+            TextParams{
+                font: FontId { 
+                    size: RESTART_TEXT_SIZE,
                     family: epaint::FontFamily::Proportional,
                 },
                 rotation: 0.0,

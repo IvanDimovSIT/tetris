@@ -88,11 +88,15 @@ pub const HELD_PIECE_SQUARE_SIZE: f32 = 1.2;
 pub const HELD_PIECE_EMPTY_TEXT: &str = "HOLD(E)";
 pub const HELD_PIECE_EMPTY_TEXT_SIZE: f32 = 32.0;
 
-pub const GAME_OVER_POSITION: (f32, f32) = (0.0, 4.0);
+pub const GAME_OVER_POSITION: (f32, f32) = (0.0, 5.0);
 pub const GAME_OVER_TEXT: &str = "Game Over!";
 pub const GAME_OVER_TEXT_SIZE: f32 = 72.0;
 pub const RESULTS_TEXT_SIZE: f32 = 28.0;
 pub const RESULTS_SIZE: (f32, f32) = (500.0, 300.0);
+
+pub const RESTART_TEXT: &str = "Press (R) to restart";
+pub const RESTART_TEXT_POSITION: (f32, f32) = (0.0, -13.0);
+pub const RESTART_TEXT_SIZE: f32 = 38.0;
 
 pub const PAUSE_TEXT: &str = "Paused (esc)";
 pub const PAUSE_TEXT_SIZE: f32 = 38.0;
