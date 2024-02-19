@@ -570,7 +570,7 @@ pub fn _comfy_default_config(config: GameConfig) -> GameConfig {
 pub async fn run() {
     init_game_config(
         "Tetris Game".to_string(),
-        "v0.0.1",
+        "v0.1.0",
         _comfy_default_config,
     );
 

@@ -11,7 +11,7 @@ pub const MIN_WINDOW_HEIGHT: u32 = 700;
 pub const SQUARE_SIZE: f32 = 1.35;
 pub const SQUARE_SIZE_INNER_COEF: f32 = 0.7;
 
-pub const GAME_BOARD_TOP_LEFT_POSITION: (f32, f32) = (-SQUARE_SIZE*(WIDTH as f32/2.0)-7.0, SQUARE_SIZE*(HEIGHT as f32/2.0)+0.0);
+pub const GAME_BOARD_TOP_LEFT_POSITION: (f32, f32) = (-13.8, 13.8);
 
 pub const SCORE_LOCATION: (f32, f32) = (7.5, -12.0);
 pub const SCORE_WIDTH: f32 = 13.0;
