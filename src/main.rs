@@ -281,6 +281,7 @@ impl GameLoopImpl {
         if result {
             play_sound(SWAP_SOUND_TAG);
             self.game_stats.swaps += 1;
+            self.time_passed = 0.0;
         }else{
             play_sound(CANTSWAP_SOUND_TAG);
         }
@@ -476,6 +477,21 @@ impl GameLoopImpl {
         }
     }
 
+    fn get_step_delay(&mut self) -> f32 {
+        let mut step_delay = if self.game_state.can_move_down() {
+            BASE_PIECE_FALL_SPEED/self.difficulty
+        }else{
+            (BASE_PIECE_FALL_SPEED/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
+        };
+           
+
+        if step_delay > PLACE_PIECE_DELAY_MAX {
+            step_delay = PLACE_PIECE_DELAY_MAX;
+        }
+
+        step_delay
+    }
+
 }
 impl GameLoop for GameLoopImpl{
     fn new(_c: &mut EngineState) -> Self {
@@ -531,16 +547,7 @@ impl GameLoop for GameLoopImpl{
         
         self.handle_input();
     
-        let mut step_delay = if self.game_state.can_move_down() {
-            BASE_PIECE_FALL_SPEED/self.difficulty
-        }else{
-            (BASE_PIECE_FALL_SPEED/self.difficulty)*PLACE_PIECE_DELAY_MULTIPLIER
-        };
-           
-
-        if step_delay > PLACE_PIECE_DELAY_MAX {
-            step_delay = PLACE_PIECE_DELAY_MAX;
-        }
+        let mut step_delay = self.get_step_delay();
 
         let mut game_events: Vec<GameEvent> = vec![];        
         while self.time_passed >= step_delay {
@@ -548,6 +555,14 @@ impl GameLoop for GameLoopImpl{
             let received = self.game_state.next_step();
             for i in received {
                 game_events.push(i);
+            }
+            if !self.game_state.can_move_down() {
+                self.time_passed = 0.0;
+            }
+            let new_step_delay = self.get_step_delay();
+            if new_step_delay != step_delay {
+                step_delay = new_step_delay;
+                self.time_passed = 0.0;
             }
         }
         self.redraw(c.delta);
