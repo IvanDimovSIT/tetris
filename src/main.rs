@@ -446,8 +446,7 @@ impl GameLoopImpl {
         }
 
         if is_key_down(KeyCode::Down) || is_key_down(KeyCode::S) {
-            let received = self.game_state.next_step();
-            self.handle_game_events(received);
+            self.time_passed += self.get_step_delay()*PUSH_DOWN_SPEED;
         }
     }
 

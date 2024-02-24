@@ -107,6 +107,8 @@ pub const PLACE_PIECE_DELAY_MULTIPLIER: f32 = 8.0;
 pub const BASE_PIECE_FALL_SPEED: f32 = 1.0;
 pub const PLACE_PIECE_DELAY_MAX: f32 = BASE_PIECE_FALL_SPEED * 1.2;
 
+pub const PUSH_DOWN_SPEED: f32 = 0.5;
+
 pub const LIGHT_EFFECT: f32 = 0.3;
 
 pub const EFFECT_Z: i32 = 2;
