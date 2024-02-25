@@ -2,9 +2,24 @@ use std::collections::VecDeque;
 
 use crate::constants::*;
 
-use self::{piece_generator::PieceGenerator, pieces::{JPiece, LPiece, LinePiece, SPiece, SquarePiece, ZPiece, TPiece}};
 
-mod pieces;
+use self::j_piece::*;
+use self::l_piece::*;
+use self::line_piece::*;
+use self::s_piece::*;
+use self::square_piece::*;
+use self::z_piece::*;
+use self::t_piece::*;
+use self::piece_generator::*;
+
+
+mod j_piece;
+mod l_piece;
+mod line_piece;
+mod s_piece;
+mod square_piece;
+mod z_piece;
+mod t_piece;
 mod piece_generator;
 
 #[derive(Clone, Copy)]
@@ -22,6 +37,31 @@ pub enum Square {
     Ghost(Color),
 }
 
+enum Rotation {
+    Up,
+    Right,
+    Down,
+    Left,
+}
+impl Rotation {
+    fn rotate_right(&mut self) {
+        match self {
+            Rotation::Up => {*self = Rotation::Right},
+            Rotation::Right => {*self = Rotation::Down},
+            Rotation::Down => {*self = Rotation::Left},
+            Rotation::Left => {*self = Rotation::Up},
+        }
+    }
+
+    fn rotate_left(&mut self) {
+        match self {
+            Rotation::Up => {*self = Rotation::Left},
+            Rotation::Right => {*self = Rotation::Up},
+            Rotation::Down => {*self = Rotation::Right},
+            Rotation::Left => {*self = Rotation::Down},
+        }
+    }
+}
 
 pub enum PieceType {
     Square,
